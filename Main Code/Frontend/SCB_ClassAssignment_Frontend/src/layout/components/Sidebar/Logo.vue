@@ -26,12 +26,12 @@
       return {
         title: '智能简历解析系统',
         // logo: require('@/assets/images/logo.png')
-        logo: new URL('@/assets/images/logo.png', import.meta.url)
+        logo: new URL('@/assets/images/resume-7637442.svg', import.meta.url)
       }
     }
   }
 </script>
-
+<!-- background: #2b2f3a; -->
 <style lang="scss" scoped>
   :deep(.sidebarLogoFade-enter-active) {
     transition: opacity 1.5s;
@@ -46,7 +46,6 @@
     width: 100%;
     height: 50px;
     line-height: 50px;
-    background: #2b2f3a;
     text-align: center;
     overflow: hidden;
 
@@ -64,7 +63,7 @@
       & .sidebar-title {
         display: inline-block;
         margin: 0;
-        color: #fff;
+        color: white;
         font-weight: 600;
         line-height: 50px;
         font-size: 14px;

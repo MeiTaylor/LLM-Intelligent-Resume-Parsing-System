@@ -2,7 +2,7 @@ import axios from "axios"
 import { useUser } from '../../stores/user'
 import { useFileStore } from '../../stores/file'
 import { useResumeDetail } from '../../stores/resume'
-
+import { useJobDetail } from '../../stores/job'
 import pinia from '../../stores'
 import { mapState, mapStores } from 'pinia'
 import { nextTick } from "vue"
@@ -65,7 +65,7 @@ export default {
     }
   },
   computed: {
-    ...mapStores(useUser, useFileStore, useResumeDetail)
+    ...mapStores(useUser, useFileStore, useResumeDetail, useJobDetail)
   },
   mounted() {
     axios.post('http://localhost:5177/api/Role/allUsers', { id: this.userStore.userId }).then((res) => {

@@ -12,51 +12,50 @@
 </template>
 
 <script>
-import { Navbar, Sidebar, AppMain } from './components'
-// import ResizeMixin from './mixin/ResizeHandler'
-import { mapState, mapStores } from 'pinia'
-import { useSetting } from '../stores/setting'
-import { useSidebar } from '../stores/app'
+  import { Navbar, Sidebar, AppMain } from './components'
+  // import ResizeMixin from './mixin/ResizeHandler'
+  import { mapState, mapStores } from 'pinia'
+  import { useSetting } from '../stores/setting'
+  import { useSidebar } from '../stores/app'
 
-const sidebar = useSidebar()
+  const sidebar = useSidebar()
 
-export default {
-  name: 'Layout',
-  components: {
-    Navbar,
-    Sidebar,
-    AppMain
-  },
-  // mixins: [ResizeMixin],
-  computed: {
-    ...mapState(useSetting, {
-      fixedHeader: store => store.fixedHeader
-    }),
-    ...mapState(useSidebar, {
-      sidebar: store => store.sidebar,
-      device: store => store.device,
-    }),
+  export default {
+    name: 'Layout',
+    components: {
+      Navbar,
+      Sidebar,
+      AppMain
+    },
+    // mixins: [ResizeMixin],
+    computed: {
+      ...mapState(useSetting, {
+        fixedHeader: store => store.fixedHeader
+      }),
+      ...mapState(useSidebar, {
+        sidebar: store => store.sidebar,
+        device: store => store.device,
+      }),
 
-    classObj() {
-      return {
-        hideSidebar: !this.sidebar.opened,
-        openSidebar: this.sidebar.opened,
-        withoutAnimation: this.sidebar.withoutAnimation,
-        mobile: this.device === 'mobile'
+      classObj() {
+        return {
+          hideSidebar: !this.sidebar.opened,
+          openSidebar: this.sidebar.opened,
+          withoutAnimation: this.sidebar.withoutAnimation,
+          mobile: this.device === 'mobile'
+        }
+      }
+    },
+    methods: {
+      handleClickOutside() {
+        sidebar.closeSideBar({ withoutAnimation: false })
+        // this.$store.dispatch('app/closeSideBar', { withoutAnimation: false })
       }
     }
-  },
-  methods: {
-    handleClickOutside() {
-      sidebar.closeSideBar({ withoutAnimation: false })
-      // this.$store.dispatch('app/closeSideBar', { withoutAnimation: false })
-    }
   }
-}
 </script>
 
 <style lang="scss">
-
   @import '@/styles/mixin.scss';
   @import '@/styles/variables.scss';
   @import '@/styles/sidebar.scss';
@@ -66,11 +65,13 @@ export default {
     position: relative;
     height: 100%;
     width: 100%;
-    &.mobile.openSidebar{
+
+    &.mobile.openSidebar {
       position: fixed;
       top: 0;
     }
   }
+
   .drawer-bg {
     background: #000;
     opacity: 0.3;
@@ -98,7 +99,7 @@ export default {
     width: 100%;
   }
 
-// 添加的样式
+
   .sidebar-container {
     transition: width 0.28s;
     width: $sideBarWidth !important;
@@ -112,7 +113,7 @@ export default {
     z-index: 1001;
     overflow: hidden;
 
-    .el-sub-menu{
+    .el-sub-menu {
       background-color: $subMenuBg !important;
     }
 
@@ -168,7 +169,7 @@ export default {
     // .submenu-title-noDropdown,
     .el-sub-menu__title {
       &:hover {
-        background-color: #213144 !important;
+        background-color: #00868B !important;
       }
     }
 
@@ -176,12 +177,13 @@ export default {
       color: $subMenuActiveText !important;
     }
 
-    & .nest-menu  {
+    & .nest-menu {
       min-width: $sideBarWidth !important;
       background-color: $subMenuBg !important;
 
       &:hover {
-        background-color: $subMenuHover !important;
+        background-color: $subMenuHover ;
+        border-radius: 10;
       }
     }
 

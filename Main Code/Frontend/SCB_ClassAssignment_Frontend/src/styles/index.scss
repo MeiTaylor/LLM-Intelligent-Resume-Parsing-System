@@ -191,19 +191,17 @@ aside {
 }
 
 
-.el-menu{
+.el-menu {
   div {
-    background-color: #304156;
-    .el-sub-menu{
-      background-color: #1f2d3d;
+
+
+    .el-sub-menu {
+      background-color: #f8faf9;
     }
   }
-  &:hover{
-    background-color: #337ab7;
-  }
+
+
 
 }
 
-.el-sub-menu{
-  
-}
+.el-sub-menu {}

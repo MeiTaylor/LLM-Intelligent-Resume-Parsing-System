@@ -27,7 +27,7 @@ public class JobPositionService implements IJobPositionService {
 
         if (jobPositions == null) {
             // 如果找不到对应的岗位，返回空的岗位信息
-            return new HomeToUploadResume(List.<JobInfoForUpload>of());
+            return new HomeToUploadResume();
         }
 
         // 获取该公司下所有岗位的信息

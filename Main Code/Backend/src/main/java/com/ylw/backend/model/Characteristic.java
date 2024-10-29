@@ -2,8 +2,10 @@ package com.ylw.backend.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+import lombok.Data;
 
 @Entity
+@Data
 public class Characteristic {
 
     @Id
@@ -18,37 +20,9 @@ public class Characteristic {
     @JsonProperty("原因")
     private String reason;
 
-    // Getters and Setters
+    private String catagory;
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getScore() {
-        return score;
-    }
-
-    public void setScore(int score) {
-        this.score = score;
-    }
-
-    public String getReason() {
-        return reason;
-    }
-
-    public void setReason(String reason) {
-        this.reason = reason;
-    }
+    @ManyToOne
+    @JoinColumn(name = "applicant_profile_id")
+    private ApplicantProfile applicantProfile;
 }

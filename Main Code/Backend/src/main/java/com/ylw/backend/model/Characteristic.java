@@ -21,4 +21,8 @@ public class Characteristic {
     private String reason;
 
     private String catagory;
+
+    @ManyToOne
+    @JoinColumn(name = "applicant_profile_id")
+    private ApplicantProfile applicantProfile;
 }

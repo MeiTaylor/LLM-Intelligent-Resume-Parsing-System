@@ -33,4 +33,9 @@ public class UserController {
     public RegisterModelClass register(@RequestBody RegisterSentModel registerSentModel) {
         return userService.createNewAccount(registerSentModel);
     }
+
+    @PostMapping("/test")
+    public ResponseEntity<String> test() {
+        return ResponseEntity.ok("Hello World");
+    }
 }

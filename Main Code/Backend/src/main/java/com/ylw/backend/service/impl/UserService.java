@@ -63,6 +63,7 @@ public class UserService implements UserServiceInterface {
             user.setCompanyId(company.getId());
             user.setAccount(register.getAccount());
             user.setPassword(register.getPassword());
+            user.setEmail(register.getEmail());
             user.setRole("admin");
             user.setCompany(company);
             userRepository.save(user);

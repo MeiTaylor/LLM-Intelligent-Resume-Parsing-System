@@ -42,7 +42,7 @@
                 <el-card class="right-part" style="height: 685px;overflow-y: auto;">
                     <template #header>
                         <div class="card-header">
-                            <h2>岗位：{{clickJobName}}</h2>
+                            <h2 style="margin: 0;">岗位：{{clickJobName}}</h2>
                         </div>
                     </template>
                     <!--TODO: 单个卡片的样式，后面需要改成v-for -->
@@ -51,7 +51,7 @@
                             <el-col :span="3">
                                 <img :src="resumeInfo.gender==='女'?womanpicter:manpicter" class="picter">
                             </el-col>
-                            <el-col :span="15">
+                            <el-col :span="21">
                                 <div>
                                     <label style="font-size:larger">{{resumeInfo.name}}</label>
                                     <label class="gender-info">{{resumeInfo.gender}} |
@@ -289,7 +289,7 @@
         width: 100%;
         height: 120px;
         margin-right: 10px;
-        margin-top: 10px;
+        margin-bottom: 10px;
     }
 
     .right-part {

@@ -60,7 +60,7 @@
         </el-row>
 
         <div>
-            <el-card style="margin-left: 10px;margin-right: 10px; margin-top: 10px; height:100%">
+            <el-card style="margin-left: 10px;margin-right: 10px; margin-top: 10px; height:100%;">
                 <template #header>
                     <div>
                         <p style="font-size: larger; font-weight: bold; padding: 0;margin: 0;">简历库</p>
@@ -68,35 +68,37 @@
                 </template>
 
                 <!--TODO: 单个卡片的样式，后面需要改成v-for -->
-                <el-card v-for="resumeInfo in resumeInfoList" class="match-card" shadow="always">
-                    <el-row :space="10">
-                        <el-col :span="2">
-                            <img :src="resumeInfo.gender==='女'?womanpicter:manpicter" class="picter">
-                        </el-col>
-                        <el-col :span="15">
-                            <div>
-                                <label style="font-size:larger">{{resumeInfo.name}}</label>
-                                <label class="gender-info">{{resumeInfo.gender}} |
-                                    {{resumeInfo.age}}岁 |
-                                    {{resumeInfo.workExperience}}年工作经验</label>
-                                <label v-for="characteristic in resumeInfo.characteristics"
-                                    class="characteristic">{{characteristic}}</label>
-                            </div>
-                            <div style="margin-top: 10px;">
-                                <label style="color: #e8bf88;">匹配岗位:{{resumeInfo.matchJob}}</label>
-                                <label
-                                    style="color:#5a8255; margin-left: 30px;">求职意向:{{resumeInfo.JobIntention}}</label>
-                            </div>
-                            <div style="margin-top: 10px;  display: flex;align-items: center;">
-                                <el-icon color="gray">
-                                    <School />
-                                </el-icon>
-                                <label class="education-info ">{{resumeInfo.school}} | {{resumeInfo.major}} |
-                                    {{resumeInfo.education}}</label>
-                            </div>
-                        </el-col>
-                    </el-row>
-                </el-card>
+                <div style="height: 370px;overflow-y: scroll;">
+                    <el-card v-for="resumeInfo in resumeInfoList" class="match-card" shadow="always">
+                        <el-row :space="10">
+                            <el-col :span="2">
+                                <img :src="resumeInfo.gender==='女'?womanpicter:manpicter" class="picter">
+                            </el-col>
+                            <el-col :span="15">
+                                <div>
+                                    <label style="font-size:larger">{{resumeInfo.name}}</label>
+                                    <label class="gender-info">{{resumeInfo.gender}} |
+                                        {{resumeInfo.age}}岁 |
+                                        {{resumeInfo.workExperience}}年工作经验</label>
+                                    <label v-for="characteristic in resumeInfo.characteristics"
+                                        class="characteristic">{{characteristic}}</label>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <label style="color: #e8bf88;">匹配岗位:{{resumeInfo.matchJob}}</label>
+                                    <label
+                                        style="color:#5a8255; margin-left: 30px;">求职意向:{{resumeInfo.JobIntention}}</label>
+                                </div>
+                                <div style="margin-top: 10px;  display: flex;align-items: center;">
+                                    <el-icon color="gray">
+                                        <School />
+                                    </el-icon>
+                                    <label class="education-info ">{{resumeInfo.school}} | {{resumeInfo.major}} |
+                                        {{resumeInfo.education}}</label>
+                                </div>
+                            </el-col>
+                        </el-row>
+                    </el-card>
+                </div>
             </el-card>
         </div>
     </div>
@@ -195,7 +197,7 @@
     }
 
     .match-card {
-        width: 100%;
+        width: 99.2%;
         height: 120px;
         margin-right: 10px;
         margin-bottom: 10px;

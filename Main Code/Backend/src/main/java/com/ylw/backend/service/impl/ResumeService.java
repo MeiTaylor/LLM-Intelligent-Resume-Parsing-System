@@ -1,6 +1,10 @@
 package com.ylw.backend.service.impl;
 
 import com.ylw.backend.config.PythonConfig;
+import com.ylw.backend.dto.BriefHomeResumeInfo;
+import com.ylw.backend.model.JobPosition;
+import com.ylw.backend.model.Resume;
+import com.ylw.backend.repository.JobPositionRepository;
 import com.ylw.backend.service.ResumeServiceInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -9,6 +13,8 @@ import jakarta.annotation.PreDestroy;  // 添加这行导入
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -24,10 +30,14 @@ public class ResumeService implements ResumeServiceInterface {
     // 用于生成线程名称
     private static final AtomicInteger threadNumber = new AtomicInteger(1);
 
+    private final JobPositionRepository jobPositionRepository;
+
     @Autowired
-    public ResumeService(PythonConfig pythonConfig) {
+    public ResumeService(PythonConfig pythonConfig, JobPositionRepository jobPositionRepository) {
         this.pythonInterpreterPath = pythonConfig.pythonInterpreterPath();
         this.pythonScriptPath = pythonConfig.pythonScriptPath();
+
+        this.jobPositionRepository = jobPositionRepository;
 
         // 创建自定义线程池
         this.executorService = new ThreadPoolExecutor(
@@ -125,5 +135,28 @@ public class ResumeService implements ResumeServiceInterface {
             executorService.shutdownNow();
             Thread.currentThread().interrupt();
         }
+    }
+
+    public List<BriefHomeResumeInfo> getBriefHomeResumeInfo(int companyId) {
+        // 从数据库获取包含 resumes 的 JobPosition 列表
+        List<JobPosition> jobPositions = jobPositionRepository.findByCompanyId(companyId);
+
+        // 将数据转换为 BriefHomeResumeInfo
+        List<BriefHomeResumeInfo> briefHomeResumeInfoList = new ArrayList<>();
+
+        for (JobPosition jobPosition : jobPositions) {
+            for (Resume resume : jobPosition.getResumes()) {
+                BriefHomeResumeInfo briefInfo = new BriefHomeResumeInfo(
+                        resume.getId(),
+                        resume.getApplicant().getName(),
+                        jobPosition.getTitle(),
+                        resume.getCreatedDate().toString(),
+                        resume.getApplicant().getHighestEducation()
+                );
+                briefHomeResumeInfoList.add(briefInfo);
+            }
+        }
+
+        return briefHomeResumeInfoList;
     }
 }

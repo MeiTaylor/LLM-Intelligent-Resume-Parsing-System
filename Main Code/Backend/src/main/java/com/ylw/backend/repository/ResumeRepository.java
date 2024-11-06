@@ -3,6 +3,7 @@ package com.ylw.backend.repository;
 import com.ylw.backend.dto.BriefHomeResumeInfo;
 import com.ylw.backend.model.Resume;
 
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -14,6 +15,7 @@ import java.util.stream.Collectors;
 @Repository
 public interface ResumeRepository extends JpaRepository<Resume, Integer> {
 
+    @EntityGraph(attributePaths = {"resumes", "resumes.applicant"})
     List<Resume> findByCompanyId(int companyId);
 
     //这个是用来返回首页的简历信息内容
@@ -29,4 +31,11 @@ public interface ResumeRepository extends JpaRepository<Resume, Integer> {
                 ))
                 .collect(Collectors.toList());
     }
+
+//    @Query("SELECT new com.ylw.backend.dto.BriefHomeResumeInfo(r.id, a.name, jp.title, FUNCTION('DATE_FORMAT', r.createdDate, '%Y-%m-%d'), a.highestEducation) " +
+//            "FROM Resume r JOIN r.jobPosition jp JOIN r.applicant a " +
+//            "WHERE jp.company.id = :companyId")
+//    List<BriefHomeResumeInfo> findBriefHomeResumeInfoByCompanyId(@Param("companyId") int companyId);
+
+
 }

@@ -26,7 +26,7 @@ export const useUser = defineStore('user', {
     actions: {
         RESET_STATE() {
             this.$reset()
-            
+
         },
         SET_TOKEN(token) {
             this.token = token
@@ -40,43 +40,43 @@ export const useUser = defineStore('user', {
         SET_ROLES(roles) {
             this.roles = [roles]
         },
-        set_userid(userId){
+        set_userid(userId) {
             this.userId = userId
         },
-        set_companyId(companyId){
+        set_companyId(companyId) {
             this.companyId = companyId
         },
         login(userInfo) {
             const { username, password } = userInfo
             return new Promise((resolve, reject) => {
                 // 去除两端空格,然后扔给API
-                login({ username: username.trim(), password: password })
-                .then(response => {
-                    if(response.code === 20000){
-                    console.log(response)
-                    const token = response.data
-                    const userId = response.userId
-                    const companyId = response.companyId
-                    const roles = token
+                login({ userName: username.trim(), password: password })
+                    .then(response => {
+                        if (response.code === 20000) {
+                            console.log(response)
+                            const token = response.data
+                            const userId = response.userId
+                            const companyId = response.companyId
+                            const roles = token
 
-                    this.SET_TOKEN(token)
-                    this.set_userid(userId)
-                    this.SET_ROLES(roles)
-                    this.set_companyId(companyId)
+                            this.SET_TOKEN(token)
+                            this.set_userid(userId)
+                            this.SET_ROLES(roles)
+                            this.set_companyId(companyId)
 
-                    // 扔进浏览器缓存
-                    setToken(token)
-                    resolve()
-                    }else{
-                        console.log(response)
-                        reject()
-                    }
-                })
-                .catch(error => {
-                    console.log("这里是stores/user.js的错误处理部分")
-                    console.log(error)
-                    reject(error)
-                })
+                            // 扔进浏览器缓存
+                            setToken(token)
+                            resolve()
+                        } else {
+                            console.log(response)
+                            reject()
+                        }
+                    })
+                    .catch(error => {
+                        console.log("这里是stores/user.js的错误处理部分")
+                        console.log(error)
+                        reject(error)
+                    })
             })
         },
 

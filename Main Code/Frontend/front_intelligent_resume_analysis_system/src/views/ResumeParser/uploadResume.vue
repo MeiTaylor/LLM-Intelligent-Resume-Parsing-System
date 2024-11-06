@@ -28,7 +28,7 @@
                     <el-row :gutter="10">
                         <el-col :span="8">
                             <el-input-number v-model="searchByAge" style="width: 75%;height: 40px;" :min="0" :max="100"
-                                placeholder="按年龄检索" />
+                                placeholder="年龄小于X检索" />
                         </el-col>
                         <el-col :span="8">
                             <el-select v-model="searchByEducation" class="m-2" placeholder="按学历检索" size="large">
@@ -38,7 +38,7 @@
                         </el-col>
                         <el-col :span="8">
                             <el-input-number v-model="searchByScore" style="width: 75%;height: 40px;" :min=" 0"
-                                :max="100" placeholder="按匹配分数检索" />
+                                :max="100" placeholder="匹配分数大于X检索" />
                         </el-col>
                         <!-- 测试 -->
 
@@ -52,7 +52,7 @@
                             <el-input v-model="searchByJobIntention" placeholder="按求职意向检索" />
                         </el-col>
                         <el-col :span="8">
-                            <el-button type="primary" style="width: 55%;">搜索</el-button>
+                            <el-button type="primary" style="width: 55%;" @click="search()">搜索</el-button>
                         </el-col>
                     </el-row>
                 </el-card>
@@ -67,10 +67,9 @@
                     </div>
                 </template>
 
-                <!--TODO: 单个卡片的样式，后面需要改成v-for -->
                 <div style="height: 370px;overflow-y: scroll;">
-                    <el-card v-for="resumeInfo in resumeInfoList" class="match-card" shadow="always">
-                        <el-row :space="10">
+                    <el-card v-for="resumeInfo in resumeInfoSearchList" class="match-card" shadow="always">
+                        <el-row :gutter="10">
                             <el-col :span="2">
                                 <img :src="resumeInfo.gender==='女'?womanpicter:manpicter" class="picter">
                             </el-col>
@@ -96,7 +95,12 @@
                                         {{resumeInfo.education}}</label>
                                 </div>
                             </el-col>
+                            <el-col :span="4" style="align-content: center;">
+                                <el-button type="warning" round
+                                    @click="gotoDetailResume(resumeInfo.resumeId)">查看详细简历</el-button>
+                            </el-col>
                         </el-row>
+
                     </el-card>
                 </div>
             </el-card>
@@ -106,75 +110,114 @@
 
 <script setup>
     import { ref, computed } from 'vue'
-    // TODO: 这是在后端发送完请求后再赋值的，还需加上为空时的异常处理
-    const resumeInfoList = ref([{
-        name: '林一',
-        gender: '男',
-        age: 22,
-        workExperience: 1,
-        education: '本科',
-        major: '计算机科学与技术',
-        score: '90',
-        JobIntention: '算法工程师',
-        matchJob: '算法工程师',
-        school: '武汉大学',
-        characteristics: ['能力出众', '经验丰富', '工作稳定']
-    }, {
-        name: '李思',
-        gender: '女',
-        age: 22,
-        workExperience: 1,
-        education: '本科',
-        major: '计算机科学与技术',
-        score: '90',
-        JobIntention: '算法工程师',
-        matchJob: '算法工程师',
-        school: '武汉大学',
-        characteristics: ['能力出众', '经验丰富', '工作稳定']
-    }, {
-        name: '龙天一',
-        gender: '男',
-        age: 22,
-        workExperience: 1,
-        education: '本科',
-        major: '计算机科学与技术',
-        score: '90',
-        JobIntention: '算法工程师',
-        matchJob: '算法工程师',
-        school: '武汉大学',
-        characteristics: ['能力出众', '经验丰富', '工作稳定']
-    }, {
-        name: '李思思',
-        gender: '女',
-        age: 22,
-        workExperience: 1,
-        education: '本科',
-        major: '计算机科学与技术',
-        score: '90',
-        JobIntention: '算法工程师',
-        matchJob: '算法工程师',
-        school: '武汉大学',
-        characteristics: ['能力出众', '经验丰富', '工作稳定']
-    }, {
-        name: '林二',
-        gender: '男',
-        age: 22,
-        workExperience: 1,
-        education: '本科',
-        major: '计算机科学与技术',
-        score: '90',
-        JobIntention: '算法工程师',
-        matchJob: '算法工程师',
-        school: '武汉大学',
-        characteristics: ['能力出众', '经验丰富', '工作稳定']
+    import axios from 'axios'
+    import { onMounted } from 'vue'
+    import { useUser } from '../../stores/user';
+    import { useRouter } from 'vue-router'
+    const manpicter = ref(new URL('@/assets/images/man.jpg', import.meta.url))
+    const womanpicter = ref(new URL('@/assets/images/women.jpg', import.meta.url))
+    const router = useRouter()
+    const userStore = useUser()
+
+    //所有ref变量
+    const resumeInfoSearchList = ref([])
+    const resumeInfoList = ref([])
+    const searchByAge = ref()
+    const searchByEducation = ref('')
+    const searchByScore = ref()
+    const searchByName = ref('')
+    const searchByJobIntention = ref('')
+    const EducationOptions = ref([
+        { value: '本科', label: '本科' },
+        { value: '硕士', label: '硕士' },
+        { value: '博士', label: '博士' },
+        { value: '大专', label: '大专' },
+        { value: '高中', label: '高中' },
+        { value: '初中', label: '初中' },
+    ])
+
+
+    //实现搜索功能
+    const search = () => {
+        var searchList = resumeInfoList.value
+        //年龄
+        if (searchByAge.value) {
+            searchList = searchList.filter((item) => {
+                return item.age < searchByAge.value
+            })
+        }
+
+        //学历
+        if (searchByEducation.value && searchByEducation.value !== '') {
+            searchList = searchList.filter((item) => {
+                return item.education === searchByEducation.value
+            })
+        }
+
+        //匹配分数
+        if (searchByScore.value) {
+            searchList = searchList.filter((item) => {
+                return item.score > searchByScore.value
+            })
+        }
+
+        //姓名
+        if (searchByName.value && searchByName.value !== '') {
+            searchList = searchList.filter((item) => {
+                console.log(`output->item.name`, item.name)
+                return item.name.includes(searchByName.value)
+
+            })
+        }
+
+        //求职意向
+        if (searchByJobIntention.value && searchByJobIntention.value !== '') {
+            searchList = searchList.filter((item) => {
+
+                return item.JobIntention.includes(searchByJobIntention.value)
+            })
+        }
+
+
+        resumeInfoSearchList.value = searchList
     }
 
 
-    ])
+    //开局调用接口更新界面
+    onMounted(async () => {
+        // console.log(`output->userStore.id`, userStore.userId)
+        //TODO: 这里的接口地址需要改成后端的接口地址
+        const res = await axios.post('https://mock.presstime.cn/mock/67275d10caf0b4e52f13f169/resume/all/resumes', {
+            userId: userStore.userId
+        })
+        resumeInfoList.value = res.data
+        resumeInfoSearchList.value = res.data
+        console.log(`output->res`, res.data)
+    })
 
-    const manpicter = ref(new URL('@/assets/images/man.jpg', import.meta.url))
-    const womanpicter = ref(new URL('@/assets/images/women.jpg', import.meta.url))
+    //函数
+    const gotoDetailResume = (resumeId) => {
+        console.log(`output->resumeId`, resumeId)
+        // console.log(`output->router`, router)
+        //进行页面跳转
+        router.push('/talent-profile/' + resumeId)
+    }
 
+    // format:每个简历的信息格式
+    // {
+    //     resumeId: 1,
+    //     name: '林一',
+    //     gender: '男',
+    //     age: 22,
+    //     workExperience: 1,
+    //     education: '本科',
+    //     major: '计算机科学与技术',
+    //     score: '90',
+    //     JobIntention: '算法工程师',
+    //     matchJob: '算法工程师',
+    //     school: '武汉大学',
+    //     characteristics: ['能力出众', '经验丰富', '工作稳定']
+    // }
 </script>
 
 <style scoped>

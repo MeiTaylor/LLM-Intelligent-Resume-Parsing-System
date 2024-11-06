@@ -84,7 +84,7 @@ export const constantRoutes = {
       需要经由权限验证而展现的页面
     */
     {
-      path: '/all-resume',
+      path: '/uploadResume',
       name: 'resume-parser',
       component: Layout,
       meta: { title: '简历分析', icon: 'document' },
@@ -94,12 +94,6 @@ export const constantRoutes = {
         name: 'parser-details',
         hidden: true,
         meta: { title: '人才画像', icon: 'document' }
-      },
-      {
-        path: '/resume-list',
-        component: () => import('../views/ResumeParser/resumeList.vue'),
-        name: 'resume-list',
-        meta: { title: '简历信息', icon: 'document' }
       },
       {
         path: '/uploadResume',
@@ -231,12 +225,6 @@ export const asyncRoutes = {
         name: 'parser-details',
         hidden: true,
         meta: { title: '人才画像', icon: 'document' }
-      },
-      {
-        path: '/resume-list',
-        component: () => import('../views/ResumeParser/resumeList.vue'),
-        name: 'resume-list',
-        meta: { title: '简历信息', icon: 'document' }
       },
       {
         path: '/uploadResume',

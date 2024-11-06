@@ -87,7 +87,8 @@
           companyName: '',
           userInfo: '',
           password: '',
-          confirmPassword: ''
+          confirmPassword: '',
+          email: ''
         },
       }
     },
@@ -109,14 +110,14 @@
             this.registerLoading = true
             return new Promise((resolve, reject) => {
               register({
-                username: this.user.username,
+                account: this.user.username,
                 password: this.user.password,
-                user_info: this.user.companyName,
-                hospital: this.user.hospital
+                name: this.user.companyName,
+                email: this.user.email
               }).then(res => {
                 this.registerLoading = false
                 this.$message({
-                  message: '注册完成，请等待管理员审核',
+                  message: '注册成功',
                   type: 'success'
                 })
                 setTimeout(function () {

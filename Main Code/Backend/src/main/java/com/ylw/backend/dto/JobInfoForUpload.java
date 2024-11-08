@@ -9,5 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class JobInfoForUpload {
     public String jobName;
-    public int jobId;
+    public int weekJobResumes;
+    public int allJobResume;
 }

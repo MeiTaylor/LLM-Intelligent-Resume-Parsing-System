@@ -15,6 +15,8 @@ public class JobPosition {
 
     private String title;
 
+    private String department;
+
     @Column(columnDefinition = "TEXT")
     private String description;
 

@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class JobPositionDTO {
     private String title;
+    private String department;
     private String description;
     private int minimumWorkYears;
     private String minimumEducationLevel;

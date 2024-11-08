@@ -1,9 +1,6 @@
 package com.ylw.backend.service.impl;
 
-import com.ylw.backend.dto.HomeToUploadResume;
-import com.ylw.backend.dto.JobInfoForUpload;
-import com.ylw.backend.dto.JobPositionDTO;
-import com.ylw.backend.dto.JobResumeCount;
+import com.ylw.backend.dto.*;
 import com.ylw.backend.model.Company;
 import com.ylw.backend.model.JobPosition;
 import com.ylw.backend.repository.CompanyRepository;
@@ -14,7 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -33,21 +32,39 @@ public class JobPositionService implements JobPositionServiceInterface {
     }
 
     @Override
-    public HomeToUploadResume getJobInfo(int userId) {
+    public List<DepartmentJobInfo> getJobInfo(int userId) {
         int companyId = userRepository.findCompanyIdById(userId).orElse(-1);
         List<JobPosition> jobPositions = jobPositionRepository.findByCompanyId(companyId);
 
-        if (jobPositions == null) {
-            // 如果找不到对应的岗位，返回空的岗位信息
-            return new HomeToUploadResume();
+        if (jobPositions == null || jobPositions.isEmpty()) {
+            // 如果找不到对应的岗位，返回空的部门列表
+            return Collections.emptyList();
         }
 
-        // 获取该公司下所有岗位的信息
-        List<JobInfoForUpload> jobsInfo = jobPositions.stream()
-                .map(jobPosition -> new JobInfoForUpload(jobPosition.getTitle(), jobPosition.getId()))
+        // 将岗位信息按照部门进行分组
+        Map<String, List<JobPosition>> departmentGroups = jobPositions.stream()
+                .collect(Collectors.groupingBy(JobPosition::getDepartment));
+
+        // 构建每个部门的 DepartmentJobInfo 对象
+        List<DepartmentJobInfo> departmentJobInfos = departmentGroups.entrySet().stream()
+                .map(entry -> {
+                    String departmentName = entry.getKey();
+                    List<JobInfoForUpload> jobInfos = entry.getValue().stream()
+                            .map(jobPosition -> {
+                                int weekJobResumes = (int) jobPosition.getResumes().stream()
+                                        .filter(resume -> resume.getCreatedDate().isAfter(LocalDateTime.now().minusWeeks(1)))
+                                        .count();
+                                int allJobResume = jobPosition.getResumes().size();
+
+                                return new JobInfoForUpload(jobPosition.getTitle(), weekJobResumes, allJobResume);
+                            })
+                            .collect(Collectors.toList());
+
+                    return new DepartmentJobInfo(departmentName, jobInfos.size(), jobInfos);
+                })
                 .collect(Collectors.toList());
 
-        return new HomeToUploadResume(jobsInfo);
+        return departmentJobInfos;
     }
 
     @Override
@@ -59,6 +76,7 @@ public class JobPositionService implements JobPositionServiceInterface {
 
         JobPosition jobPosition = new JobPosition();
         jobPosition.setTitle(jobPositionDTO.getTitle());
+        jobPosition.setDepartment(jobPositionDTO.getDepartment());
         jobPosition.setDescription(jobPositionDTO.getDescription());
         jobPosition.setMinimumWorkYears(jobPositionDTO.getMinimumWorkYears());
         jobPosition.setMinimumEducationLevel(jobPositionDTO.getMinimumEducationLevel());

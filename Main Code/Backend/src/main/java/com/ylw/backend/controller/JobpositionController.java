@@ -38,10 +38,10 @@ public class JobpositionController {
     @PostMapping("/add-bulk")
     public ResponseEntity<List<JobPosition>> addBulkJobPositions() {
         List<JobPositionDTO> jobPositionDTOs = Arrays.asList(
-                new JobPositionDTO("产品运营/电商运营", "市场部",
+                new JobPositionDTO("产品/电商运营", "市场部",
                         "要求至少2年的运营经验，电商背景优先。必须具备数据分析和项目管理能力。需要有自我驱动力，逻辑思维清晰，以及强沟通能力。",
                         2, "本科", 1), // 假设公司ID为1
-                new JobPositionDTO("设计与创意（平面设计师）", "设计部",
+                new JobPositionDTO("平面设计师", "设计部",
                         "至少大专学历，1-2年相关工作经验。需要熟练掌握设计软件和视频剪辑。需要具备创新思维，良好的沟通能力和责任感。",
                         1, "大专", 1),
                 new JobPositionDTO("产品经理", "产品部",
@@ -53,16 +53,16 @@ public class JobpositionController {
                 new JobPositionDTO("财务/风控专员", "财务部",
                         "本科及以上学历，金融或相关专业。必须了解财务、会计、税收政策知识，具备风控经验。需要具有数据分析能力和EXCEL的熟练操作。",
                         0, "本科", 1),
-                new JobPositionDTO("市场营销/项目主管", "市场部",
+                new JobPositionDTO("市场营销", "市场部",
                         "本科及以上学历，至少3年相关经验。熟练使用办公软件，能够管理客户关系。需要有市场策划和拓展经验，以及良好的执行力。",
                         3, "本科", 1),
-                new JobPositionDTO("技术开发（开发工程师）", "技术部",
+                new JobPositionDTO("开发工程师", "技术部",
                         "本科及以上学历，计算机相关专业。至少3年的软件开发经验。需要熟练使用JAVA，有APP开发经验。",
                         3, "本科", 1),
                 new JobPositionDTO("网络安全工程师", "技术部",
                         "负责公司网络和系统的安全防护，识别和防范潜在的网络攻击。",
                         3, "本科", 1),
-                new JobPositionDTO("行政支持（文员/人力资源管理）", "行政部",
+                new JobPositionDTO("人力资源管理", "行政部",
                         "大专及以上学历，至少1年相关经验。熟练使用办公软件，具备日常管理和档案处理能力。需要了解人力资源流程和法规，具有全面的沟通能力。",
                         1, "大专", 1),
                 new JobPositionDTO("行政主管", "行政部",

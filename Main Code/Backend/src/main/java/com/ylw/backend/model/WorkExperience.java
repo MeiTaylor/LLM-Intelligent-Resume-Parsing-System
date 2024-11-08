@@ -15,9 +15,6 @@ public class WorkExperience {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "applicant_id", insertable = false, updatable = false)
-    private int applicantId;
-
     @JsonProperty("地点")
     private String companyName;
 

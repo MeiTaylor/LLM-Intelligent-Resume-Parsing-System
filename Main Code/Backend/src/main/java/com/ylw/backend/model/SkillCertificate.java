@@ -14,9 +14,6 @@ public class SkillCertificate {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "applicant_id", insertable = false, updatable = false)
-    private int applicantId;
-
     private String skillName;
 
     @JsonIgnore

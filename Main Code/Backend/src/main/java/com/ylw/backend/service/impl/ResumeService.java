@@ -6,7 +6,9 @@ import com.ylw.backend.model.Applicant;
 import com.ylw.backend.model.JobPosition;
 import com.ylw.backend.model.Resume;
 import com.ylw.backend.repository.ApplicantRepository;
+import com.ylw.backend.repository.CompanyRepository;
 import com.ylw.backend.repository.JobPositionRepository;
+import com.ylw.backend.repository.ResumeRepository;
 import com.ylw.backend.service.ResumeServiceInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -38,15 +40,18 @@ public class ResumeService implements ResumeServiceInterface {
     private final JobPositionRepository jobPositionRepository;
     private final ApplicantService applicantService;
     private final ApplicantRepository applicantRepository;
+    private final ResumeRepository resumeRepository;
+    private final CompanyRepository companyRepository;
 
     @Autowired
-    public ResumeService(PythonConfig pythonConfig, JobPositionRepository jobPositionRepository, ApplicantService applicantService, ApplicantRepository applicantRepository) {
+    public ResumeService(PythonConfig pythonConfig, JobPositionRepository jobPositionRepository, ApplicantService applicantService, ApplicantRepository applicantRepository, ResumeRepository resumeRepository, CompanyRepository companyRepository) {
         this.pythonInterpreterPath = pythonConfig.pythonInterpreterPath();
         this.pythonScriptPath = pythonConfig.pythonScriptPath();
 
         this.jobPositionRepository = jobPositionRepository;
         this.applicantService = applicantService;
         this.applicantRepository = applicantRepository;
+        this.resumeRepository = resumeRepository;
 
         // 创建自定义线程池
         this.executorService = new ThreadPoolExecutor(
@@ -58,6 +63,7 @@ public class ResumeService implements ResumeServiceInterface {
                 r -> new Thread(r, "ResumeParser-" + threadNumber.getAndIncrement()), // 线程工厂
                 new ThreadPoolExecutor.CallerRunsPolicy() // 拒绝策略
         );
+        this.companyRepository = companyRepository;
     }
 
     @Override
@@ -77,8 +83,28 @@ public class ResumeService implements ResumeServiceInterface {
         applicantRepository.save(applicant);
 
         return applicant;
-
     }
+
+    /**
+     * 创建并保存 Resume 对象
+     *
+     * @param resumePath 文件路径
+     * @param applicant  关联的申请人
+     * @return 保存后的 Resume 对象
+     */
+    @Override
+    public void createAndSaveResume(String resumePath, Applicant applicant, int jobId, int userId) {
+        Resume resume = new Resume();
+        resume.setFilePath(resumePath);
+        resume.setApplicant(applicant);
+        //resume.setCreatedDate(LocalDateTime.now());
+        resume.setJobPosition(jobPositionRepository.findById(jobId).orElse(null));
+        resume.setCompany(companyRepository.findByUsers_Id(userId).orElse(null));
+        // 保存 Resume 到数据库
+        applicant.setResume(resume);
+        resumeRepository.save(resume);
+    }
+
 
     @Override
     public Applicant parseResumeTest(String resumePath) {

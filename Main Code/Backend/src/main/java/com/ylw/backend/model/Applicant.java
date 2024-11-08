@@ -43,25 +43,23 @@ public class Applicant {
 
     // 关系映射 - 简历
     @JsonIgnore
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "resume_id", referencedColumnName = "id")
+    @OneToOne(mappedBy = "applicant", cascade = CascadeType.ALL, orphanRemoval = true)
     private Resume resume;
 
     // 关系映射 - 个人资料
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "applicant_profile_id", referencedColumnName = "id")
+    @OneToOne(mappedBy = "applicant", cascade = CascadeType.ALL, orphanRemoval = true)
     private ApplicantProfile applicantProfile;
 
     // 关系映射 - 获奖荣誉
-    @OneToMany(mappedBy = "applicant", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "applicant", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Award> awards;
 
     // 关系映射 - 工作经历
-    @OneToMany(mappedBy = "applicant", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "applicant", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<WorkExperience> workExperiences;
 
     // 关系映射 - 技能证书
-    @OneToMany(mappedBy = "applicant", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "applicant", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SkillCertificate> skillCertificates;
 
 //    // 关系映射 - 教育背景

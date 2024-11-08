@@ -15,15 +15,12 @@ public class Award {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "applicant_id")
-    private int applicantId;
-
     private String awardName;
 
     // 导航属性 - 申请人
     @JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "applicant_id", insertable = false, updatable = false)
+    @JoinColumn(name = "applicant_id")
     private Applicant applicant;
 
 }

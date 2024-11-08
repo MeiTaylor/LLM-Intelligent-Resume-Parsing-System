@@ -1,8 +1,13 @@
 package com.ylw.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.Data;
+import lombok.ToString;
 
+@Data
 @Entity
+@ToString(exclude = "applicant")
 public class SkillCertificate {
 
     @Id
@@ -14,41 +19,9 @@ public class SkillCertificate {
 
     private String skillName;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "applicant_id")
     private Applicant applicant;
 
-    // Getters and Setters
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public int getApplicantId() {
-        return applicantId;
-    }
-
-    public void setApplicantId(int applicantId) {
-        this.applicantId = applicantId;
-    }
-
-    public String getSkillName() {
-        return skillName;
-    }
-
-    public void setSkillName(String skillName) {
-        this.skillName = skillName;
-    }
-
-    public Applicant getApplicant() {
-        return applicant;
-    }
-
-    public void setApplicant(Applicant applicant) {
-        this.applicant = applicant;
-    }
 }

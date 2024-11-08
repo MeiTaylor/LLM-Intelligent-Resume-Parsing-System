@@ -1,13 +1,17 @@
 package com.ylw.backend.service.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ylw.backend.model.*;
 import com.ylw.backend.service.ApplicantServiceInterface;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -30,23 +34,40 @@ public class ApplicantService implements ApplicantServiceInterface {
             applicant.setName(personalInfo.get("姓名"));
             applicant.setEmail(personalInfo.get("电子邮箱"));
             applicant.setPhoneNumber(personalInfo.get("电话"));
-            applicant.setAge(Integer.parseInt(personalInfo.get("年龄")));
+            Object ageValue = personalInfo.get("年龄");
+
+            if (ageValue instanceof Integer) {
+                applicant.setAge((Integer) ageValue); // 如果是 Integer 类型，直接设置
+            } else if (ageValue instanceof String) {
+                applicant.setAge(Integer.parseInt((String) ageValue)); // 如果是 String 类型，转换为 Integer
+            } else {
+                throw new IllegalArgumentException("年龄字段的类型不正确: " + ageValue);
+            }
+
             applicant.setGender(personalInfo.get("性别"));
 
             // 设置求职意向
             applicant.setJobIntention((String) jsonMap.get("求职意向"));
 
-            // 创建教育背景
             Map<String, String> educationInfo = (Map<String, String>) jsonMap.get("教育背景");
-            EducationBackground educationBackground = new EducationBackground();
-            educationBackground.setSchool(educationInfo.get("毕业院校"));
-            educationBackground.setMajor(educationInfo.get("专业"));
-            educationBackground.setTime(""); // 需要根据实际数据格式设置
-            educationBackground.setApplicant(applicant);
+            applicant.setHighestEducation(educationInfo.get("最高学历"));
+            applicant.setMajor(educationInfo.get("专业"));
+            applicant.setGraduatedFrom(educationInfo.get("毕业院校"));
+            applicant.setGraduatedFromLevel(educationInfo.get("院校级别"));
+            applicant.setSelfEvaluation((String) jsonMap.get("自我评价"));
 
-            List<EducationBackground> educationBackgrounds = new ArrayList<>();
-            educationBackgrounds.add(educationBackground);
-            applicant.setEducationBackgrounds(educationBackgrounds);
+
+//            // 创建教育背景
+//            Map<String, String> educationInfo = (Map<String, String>) jsonMap.get("教育背景");
+//            EducationBackground educationBackground = new EducationBackground();
+//            educationBackground.setSchool(educationInfo.get("毕业院校"));
+//            educationBackground.setMajor(educationInfo.get("专业"));
+//            educationBackground.setTime(""); // 需要根据实际数据格式设置
+//            educationBackground.setApplicant(applicant);
+//
+//            List<EducationBackground> educationBackgrounds = new ArrayList<>();
+//            educationBackgrounds.add(educationBackground);
+//            applicant.setEducationBackgrounds(educationBackgrounds);
 
             // 设置工作经历
             List<Map<String, String>> workExperienceList = (List<Map<String, String>>) jsonMap.get("工作经历");
@@ -62,6 +83,13 @@ public class ApplicantService implements ApplicantServiceInterface {
                 workExperiences.add(workExperience);
             }
             applicant.setWorkExperiences(workExperiences);
+
+            Object totalWorkYearsValue = jsonMap.get("工作总时间");
+            if (totalWorkYearsValue instanceof Integer) {
+                applicant.setTotalWorkYears((Integer) totalWorkYearsValue);
+            } else {
+                applicant.setTotalWorkYears(0);
+            }
 
             // 设置技能证书
             List<String> skillsAndCerts = (List<String>) jsonMap.get("技能和证书");
@@ -85,18 +113,19 @@ public class ApplicantService implements ApplicantServiceInterface {
             }
             applicant.setAwards(awardList);
 
+            Map<String, String> stability = (Map<String, String>) jsonMap.get("工作稳定性");
+            applicant.setWorkStability(stability.get("等级"));
+            applicant.setWorkStabilityReason(stability.get("原因"));
+
             // 设置个人资料（ApplicantProfile）
             ApplicantProfile profile = new ApplicantProfile();
-            Map<String, String> stability = (Map<String, String>) jsonMap.get("工作稳定性");
-            profile.setWorkStability(stability.get("等级"));
-            profile.setStabilityReason(stability.get("原因"));
 
             // 设置工作特征
             List<String> workTraits = (List<String>) jsonMap.get("工作特性标签");
             List<WorkTrait> workTraitList = new ArrayList<>();
             for (String trait : workTraits) {
                 WorkTrait workTrait = new WorkTrait();
-                // 注意：WorkTrait的具体属性需要根据实际类定义设置
+                workTrait.setTrait(trait);
                 workTraitList.add(workTrait);
             }
             profile.setWorkTraits(workTraitList);
@@ -111,6 +140,120 @@ public class ApplicantService implements ApplicantServiceInterface {
             return applicant;
 
         } catch (Exception e) {
+            // 打印详细堆栈信息
+            e.printStackTrace();
+
+            // 抛出包含更多信息的运行时异常
+            String errorMessage = String.format("Failed to read or parse JSON file: %s. Error: %s", jsonFilePath, e.getMessage());
+            throw new RuntimeException(errorMessage, e);
+        }
+    }
+
+    @Override
+    public void parseCharacteristicsJson(ApplicantProfile applicantProfile, String jsonFilePath) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode rootNode = objectMapper.readTree(new File(jsonFilePath));
+
+            // 遍历每个大类（例如 "个人特性", "技能和经验", "成就和亮点评价"）
+            Iterator<String> mainCategories = rootNode.fieldNames();
+            List<Characteristic> characteristics = new ArrayList<>();
+
+            while (mainCategories.hasNext()) {
+                String categoryName = mainCategories.next(); // 大类名称，例如 "个人特性"
+                JsonNode categoryNode = rootNode.get(categoryName);
+
+                if (categoryNode == null || !categoryNode.isObject()) {
+                    System.err.println("Warning: Category node is null or not an object for category name: " + categoryName);
+                    continue;
+                }
+
+                // 遍历每个大类中的小类（例如 "自我驱动性", "适应能力"）
+                Iterator<String> subCategories = categoryNode.fieldNames();
+                while (subCategories.hasNext()) {
+                    String subCategoryName = subCategories.next(); // 小类名称，例如 "自我驱动性"
+                    JsonNode subCategoryNode = categoryNode.get(subCategoryName);
+
+                    if (subCategoryNode == null || !subCategoryNode.isObject()) {
+                        System.err.println("Warning: Sub-category node is null or not an object for sub-category name: " + subCategoryName);
+                        continue;
+                    }
+
+                    try {
+                        JsonNode scoreNode = subCategoryNode.get("分数");
+                        JsonNode reasonNode = subCategoryNode.get("原因");
+
+                        if (scoreNode == null || reasonNode == null) {
+                            System.err.println("Warning: Missing '分数' or '原因' in sub-category: " + subCategoryName);
+                            continue;
+                        }
+
+                        Characteristic characteristic = new Characteristic();
+                        characteristic.setCatagory(categoryName); // 设置大类名称
+                        characteristic.setName(subCategoryName); // 设置小类名称
+                        characteristic.setScore(scoreNode.asInt());
+                        characteristic.setReason(reasonNode.asText());
+                        characteristic.setApplicantProfile(applicantProfile);
+
+                        characteristics.add(characteristic);
+                    } catch (Exception e) {
+                        System.err.println("Error processing sub-category: " + subCategoryName + " in category: " + categoryName + ". Error: " + e.getMessage());
+                        e.printStackTrace();
+                    }
+                }
+            }
+            applicantProfile.setCharacteristics(characteristics);
+
+        } catch (IOException e) {
+            System.err.println("Failed to read or parse JSON file: " + jsonFilePath + ". Error: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Failed to read or parse JSON file: " + jsonFilePath, e);
+        }
+    }
+
+    public void parseJobMatchingJson(ApplicantProfile applicantProfile, String jsonFilePath) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode rootNode = objectMapper.readTree(new File(jsonFilePath));
+
+            // 从 JSON 文件中提取数据并创建 JobMatch 对象
+            List<JobMatch> jobMatches = new ArrayList<>();
+            Iterator<String> fieldNames = rootNode.fieldNames();
+            while (fieldNames.hasNext()) {
+                String jobTitle = fieldNames.next();
+                JsonNode jobNode = rootNode.get(jobTitle);
+
+                if (jobNode == null) {
+                    System.err.println("Warning: Job node is null for job title: " + jobTitle);
+                    continue;
+                }
+
+                try {
+                    JsonNode scoreNode = jobNode.get("人岗匹配程度分数");
+                    JsonNode reasonNode = jobNode.get("人岗匹配的理由");
+
+                    if (scoreNode == null || reasonNode == null) {
+                        System.err.println("Warning: Missing '人岗匹配程度分数' or '人岗匹配的理由' for job title: " + jobTitle);
+                        continue;
+                    }
+
+                    JobMatch jobMatch = new JobMatch();
+                    jobMatch.setJobTitle(jobTitle);
+                    jobMatch.setScore(scoreNode.asInt());
+                    jobMatch.setReason(reasonNode.asText());
+                    jobMatch.setApplicantProfile(applicantProfile);
+
+                    jobMatches.add(jobMatch);
+                } catch (Exception e) {
+                    System.err.println("Error processing job title: " + jobTitle + ". Error: " + e.getMessage());
+                    e.printStackTrace();
+                }
+            }
+            applicantProfile.setJobMatches(jobMatches);
+
+        } catch (IOException e) {
+            System.err.println("Failed to read or parse JSON file: " + jsonFilePath + ". Error: " + e.getMessage());
+            e.printStackTrace();
             throw new RuntimeException("Failed to read or parse JSON file: " + jsonFilePath, e);
         }
     }

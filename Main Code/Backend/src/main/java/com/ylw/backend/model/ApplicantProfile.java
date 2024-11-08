@@ -3,9 +3,12 @@ package com.ylw.backend.model;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.ToString;
 
 @Entity
 @Data
+@ToString(exclude = "applicant")
 public class ApplicantProfile {
 
     @Id
@@ -15,13 +18,13 @@ public class ApplicantProfile {
     @Column(name = "applicant_id")
     private int applicantId;
 
-    private String matchingReason; // 给出此工作稳定性判断的原因
-
-    private int matchingScore; // 人岗匹配程度分数
-
-    private String workStability; // 工作稳定性的程度
-
-    private String stabilityReason; // 工作稳定性判断的原因
+//    private String matchingReason; // 给出此工作稳定性判断的原因
+//
+//    private int matchingScore; // 人岗匹配程度分数
+//
+//    private String workStability; // 工作稳定性的程度
+//
+//    private String stabilityReason; // 工作稳定性判断的原因
 
     // 导航属性 - 求职匹配
     @OneToMany(mappedBy = "applicantProfile", cascade = CascadeType.ALL)
@@ -35,6 +38,7 @@ public class ApplicantProfile {
     private List<Characteristic> characteristics;
 
     // 导航属性 - 申请人
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "applicant_id", insertable = false, updatable = false)
     private Applicant applicant;

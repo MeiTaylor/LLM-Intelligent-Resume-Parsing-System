@@ -1,5 +1,6 @@
 package com.ylw.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.util.List;
 import lombok.Data;
@@ -36,7 +37,12 @@ public class Applicant {
 
     private int totalWorkYears; // 工作总时间
 
+    private String workStability; // 工作稳定性
+
+    public String workStabilityReason; // 工作稳定性原因
+
     // 关系映射 - 简历
+    @JsonIgnore
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "resume_id", referencedColumnName = "id")
     private Resume resume;
@@ -58,7 +64,7 @@ public class Applicant {
     @OneToMany(mappedBy = "applicant", cascade = CascadeType.ALL)
     private List<SkillCertificate> skillCertificates;
 
-    // 关系映射 - 教育背景
-    @OneToMany(mappedBy = "applicant", cascade = CascadeType.ALL)
-    private List<EducationBackground> educationBackgrounds;
+//    // 关系映射 - 教育背景
+//    @OneToMany(mappedBy = "applicant", cascade = CascadeType.ALL)
+//    private List<EducationBackground> educationBackgrounds;
 }

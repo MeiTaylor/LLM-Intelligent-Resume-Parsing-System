@@ -2,8 +2,10 @@ package com.ylw.backend.service.impl;
 
 import com.ylw.backend.config.PythonConfig;
 import com.ylw.backend.dto.BriefHomeResumeInfo;
+import com.ylw.backend.model.Applicant;
 import com.ylw.backend.model.JobPosition;
 import com.ylw.backend.model.Resume;
+import com.ylw.backend.repository.ApplicantRepository;
 import com.ylw.backend.repository.JobPositionRepository;
 import com.ylw.backend.service.ResumeServiceInterface;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,10 +13,13 @@ import org.springframework.stereotype.Service;
 import jakarta.annotation.PreDestroy;  // 添加这行导入
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -31,13 +36,17 @@ public class ResumeService implements ResumeServiceInterface {
     private static final AtomicInteger threadNumber = new AtomicInteger(1);
 
     private final JobPositionRepository jobPositionRepository;
+    private final ApplicantService applicantService;
+    private final ApplicantRepository applicantRepository;
 
     @Autowired
-    public ResumeService(PythonConfig pythonConfig, JobPositionRepository jobPositionRepository) {
+    public ResumeService(PythonConfig pythonConfig, JobPositionRepository jobPositionRepository, ApplicantService applicantService, ApplicantRepository applicantRepository) {
         this.pythonInterpreterPath = pythonConfig.pythonInterpreterPath();
         this.pythonScriptPath = pythonConfig.pythonScriptPath();
 
         this.jobPositionRepository = jobPositionRepository;
+        this.applicantService = applicantService;
+        this.applicantRepository = applicantRepository;
 
         // 创建自定义线程池
         this.executorService = new ThreadPoolExecutor(
@@ -52,16 +61,35 @@ public class ResumeService implements ResumeServiceInterface {
     }
 
     @Override
-    public void parseResume(String resumePath) {
+    public Applicant parseResume(String resumePath) {
         CompletableFuture.runAsync(() -> runPythonScript(resumePath), executorService)
                 .exceptionally(throwable -> {
                     System.err.println("简历解析发生异常: " + throwable.getMessage());
                     throwable.printStackTrace();
                     return null;
                 });
-
+        // 根据Python脚本中的规则推导出生成的所有JSON文件路径
+        Map<String, String> jsonFilePaths = deriveJsonFilePaths(resumePath);
         // 读取json文件内容，存数据库
+        Applicant applicant = applicantService.createApplicantFromJsonFile(jsonFilePaths.get("Basic_Resume_Analysis"));
+        applicantService.parseCharacteristicsJson(applicant.getApplicantProfile(), jsonFilePaths.get("GPT_Talent_Portraits"));
+        applicantService.parseJobMatchingJson(applicant.getApplicantProfile(), jsonFilePaths.get("GPT_Job_Matching"));
+        applicantRepository.save(applicant);
 
+        return applicant;
+
+    }
+
+    @Override
+    public Applicant parseResumeTest(String resumePath) {
+        // 根据Python脚本中的规则推导出生成的所有JSON文件路径
+        Map<String, String> jsonFilePaths = deriveJsonFilePaths(resumePath);
+        // 读取json文件内容，存数据库
+        Applicant applicant = applicantService.createApplicantFromJsonFile(jsonFilePaths.get("Basic_Resume_Analysis"));
+        applicantService.parseCharacteristicsJson(applicant.getApplicantProfile(), jsonFilePaths.get("GPT_Talent_Portraits"));
+        applicantService.parseJobMatchingJson(applicant.getApplicantProfile(), jsonFilePaths.get("GPT_Job_Matching"));
+        applicantRepository.save(applicant);
+        return applicant;
     }
 
     /**
@@ -158,5 +186,34 @@ public class ResumeService implements ResumeServiceInterface {
         }
 
         return briefHomeResumeInfoList;
+    }
+
+    private Map<String, String> deriveJsonFilePaths(String resumePath) {
+        // 根据Python脚本逻辑，推导生成所有JSON文件的路径
+        Map<String, String> jsonFilePaths = new HashMap<>();
+
+        // 向上跳两级目录获取 baseDir
+        File resumeFile = new File(resumePath);
+        File baseDir = resumeFile.getParentFile().getParentFile();
+
+        // 分别处理三种输出目录类型
+        String[] outputJsonDirs = {"Basic_Resume_Analysis", "GPT_Talent_Portraits", "GPT_Job_Matching"};
+
+        for (String outputJsonDir : outputJsonDirs) {
+            // 构建输出 JSON 文件的目录
+            File jsonOutputDir = new File(baseDir, "Analysis_Results/" + outputJsonDir);
+            if (!jsonOutputDir.exists()) {
+                System.err.println("输出目录不存在：" + jsonOutputDir.getPath());
+                jsonFilePaths.put(outputJsonDir, null);
+                continue;
+            }
+
+            // 根据输入的简历文件名，生成对应的JSON文件名
+            String jsonFileName = resumeFile.getName().replaceAll("\\.docx$", "") + ".json";
+            String jsonFilePath = new File(jsonOutputDir, jsonFileName).getPath();
+            jsonFilePaths.put(outputJsonDir, jsonFilePath);
+        }
+
+        return jsonFilePaths;
     }
 }

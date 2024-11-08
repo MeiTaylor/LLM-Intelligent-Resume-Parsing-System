@@ -1,9 +1,14 @@
 package com.ylw.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+import lombok.Data;
+import lombok.ToString;
 
+@Data
 @Entity
+@ToString(exclude = "applicant")
 public class WorkExperience {
 
     @Id
@@ -25,65 +30,9 @@ public class WorkExperience {
     @JsonProperty("任务")
     private String task;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "applicant_id")
     private Applicant applicant;
 
-    // Getters and Setters
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public int getApplicantId() {
-        return applicantId;
-    }
-
-    public void setApplicantId(int applicantId) {
-        this.applicantId = applicantId;
-    }
-
-    public String getCompanyName() {
-        return companyName;
-    }
-
-    public void setCompanyName(String companyName) {
-        this.companyName = companyName;
-    }
-
-    public String getPosition() {
-        return position;
-    }
-
-    public void setPosition(String position) {
-        this.position = position;
-    }
-
-    public String getTime() {
-        return time;
-    }
-
-    public void setTime(String time) {
-        this.time = time;
-    }
-
-    public String getTask() {
-        return task;
-    }
-
-    public void setTask(String task) {
-        this.task = task;
-    }
-
-    public Applicant getApplicant() {
-        return applicant;
-    }
-
-    public void setApplicant(Applicant applicant) {
-        this.applicant = applicant;
-    }
 }

@@ -1,8 +1,13 @@
 package com.ylw.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.Data;
+import lombok.ToString;
 
 @Entity
+@Data
+@ToString(exclude = "applicantProfile")
 public class WorkTrait {
 
     @Id
@@ -14,41 +19,8 @@ public class WorkTrait {
 
     private String trait;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "applicant_profile_id")
     private ApplicantProfile applicantProfile;
-
-    // Getters and Setters
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public int getApplicantProfileId() {
-        return applicantProfileId;
-    }
-
-    public void setApplicantProfileId(int applicantProfileId) {
-        this.applicantProfileId = applicantProfileId;
-    }
-
-    public String getTrait() {
-        return trait;
-    }
-
-    public void setTrait(String trait) {
-        this.trait = trait;
-    }
-
-    public ApplicantProfile getApplicantProfile() {
-        return applicantProfile;
-    }
-
-    public void setApplicantProfile(ApplicantProfile applicantProfile) {
-        this.applicantProfile = applicantProfile;
-    }
 }

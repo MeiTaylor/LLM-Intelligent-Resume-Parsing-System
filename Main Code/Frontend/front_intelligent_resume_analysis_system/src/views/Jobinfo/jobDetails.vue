@@ -11,25 +11,17 @@
                     <div>
 
                         <el-tree style="max-width: 1000px;" :data="data" node-key="id" default-expand-all
-                            :expand-on-click-node="true" :indent="30" :highlight-current="true">
+                            :expand-on-click-node="true" :indent="10" :highlight-current="true">
                             <template #default="{ node, data }">
 
-                                <span @click="handleNodeClick(data.name)" class="custom-tree-node">
+                                <span @click="handleNodeClick(data.jobName)" class="custom-tree-node">
                                     <!-- 一级目录 -->
                                     <label v-if="data.jobNumber" style="font-size: 17px;">{{data.name}}</label>
-                                    <label v-else style="font-size: 15px;">{{data.name}}</label>
+                                    <label v-else style="font-size: 15px;">{{data.jobName}}</label>
                                     <label v-if="data.jobNumber" class="job-numbers">{{data.jobNumber}}</label>
                                     <label v-else
                                         class="job-numbers">{{data.weekJobResumes}}/{{data.allJobResume}}</label>
                                 </span>
-                                <!-- <el-row @click="handleNodeClick(data.name)" :span="10">
-                                    <el-col style="font-size: 20px;" :span="18">{{data.name}}</el-col>
-                                    <el-col :span="6">
-                                        <label v-if="data.jobNumber" class="job-numbers">{{data.jobNumber}}</label>
-                                        <label v-else
-                                            class="job-numbers">{{data.weekJobResumes}}/{{data.allJobResume}}</label>
-                                    </el-col>
-                                </el-row> -->
                             </template>
                         </el-tree>
 
@@ -82,67 +74,14 @@
 </template>
 
 <script setup>
-    import { ref, computed } from 'vue'
+    import { ref, computed, onMounted } from 'vue'
+    import axios from 'axios'
+    import { useUser } from '../../stores/user';
 
-    const data = ref(
-        [
-            {
-                name: '平面设计部',
-                jobNumber: 2,
-                children: [
-                    { name: '平面设计师', weekJobResumes: 8, allJobResume: 40 },
-                    { name: 'UI设计师', weekJobResumes: 2, allJobResume: 10 },
-                ],
-            },
-            {
-                name: '技术部',
-                jobNumber: 3,
-                children: [
-                    { name: '前端工程师', weekJobResumes: 10, allJobResume: 250 },
-                    { name: '后端工程师', weekJobResumes: 10, allJobResume: 150 },
-                    { name: '全栈工程师', weekJobResumes: 10, allJobResume: 5 },
-                ],
-            },
-            {
-                name: '运营部',
-                jobNumber: 2,
+    //创建store变量
+    const userStore = useUser()
 
-                children: [
-                    { name: '产品经理', weekJobResumes: 10, allJobResume: 50 },
-                    { name: '运营', weekJobResumes: 10, allJobResume: 50 },
-                ],
-            },
-            {
-                name: '市场部',
-                jobNumber: 2,
-
-                children: [
-                    { name: '市场', weekJobResumes: 10, allJobResume: 50 },
-                    { name: '销售', weekJobResumes: 10, allJobResume: 50 },
-                ],
-            },
-            {
-                name: '人事部',
-                jobNumber: 1,
-
-                children: [
-                    { name: '人事', weekJobResumes: 10, allJobResume: 50 },
-                ],
-            },
-            {
-                name: '其他',
-                jobNumber: 1,
-
-                children: [
-                    { name: '其他', weekJobResumes: 10, allJobResume: 50 },
-                ],
-            }
-
-
-        ]
-
-
-    )
+    const data = ref([])
 
     const defaultProps = {
         children: 'children',
@@ -214,24 +153,10 @@
 
     ])
 
-    const resumeInfo = {
-        name: '林一',
-        gender: '男',
-        age: 22,
-        workExperience: 1,
-        education: '本科',
-        major: '计算机科学与技术',
-        score: '90',
-        JobIntention: '算法工程师',
-        matchJob: '算法工程师',
-        school: '武汉大学',
-        characteristics: ['能力出众', '经验丰富', '工作稳定']
-    }
 
     const manpicter = ref(new URL('@/assets/images/man.jpg', import.meta.url))
     const womanpicter = ref(new URL('@/assets/images/women.jpg', import.meta.url))
-    // TODO：这个应该是在向后端发请求后再赋值
-    const clickJobName = ref(data.value[0].children[0].name)
+    const clickJobName = ref()
 
     //函数
     const handleNodeClick = (newclickJobName) => {
@@ -249,6 +174,33 @@
         }
     }
 
+    //挂载函数
+    onMounted(() => {
+        //向后端发送请求
+        axios.post('http://localhost:8080/api/jobposition/departments/jobs', {
+            userId: userStore.userId
+        }).then((res) => {
+            console.log(`output->res`, res)
+            //修改左边的树形结构数据
+            data.value = res.data
+            //使用第一个默认的数据
+            clickJobName.value = data.value[0].children[0].jobName
+        })
+    })
+
+
+
+    // 文件格式
+    // [
+    //         {
+    //             name: '平面设计部',
+    //             jobNumber: 2,
+    //             children: [
+    //                 { name: '平面设计师', weekJobResumes: 8, allJobResume: 40 },
+    //                 { name: 'UI设计师', weekJobResumes: 2, allJobResume: 10 },
+    //             ],
+    //         }
+    //     ]
 </script>
 
 <style scoped>

@@ -1,9 +1,6 @@
 package com.ylw.backend.controller;
 
-import com.ylw.backend.dto.DepartmentJobInfo;
-import com.ylw.backend.dto.HomeToUploadResume;
-import com.ylw.backend.dto.JobPositionDTO;
-import com.ylw.backend.dto.WebSentUserId;
+import com.ylw.backend.dto.*;
 import com.ylw.backend.model.JobPosition;
 import com.ylw.backend.service.JobPositionServiceInterface;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,9 +31,8 @@ public class JobpositionController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<JobPosition> addJobPosition(@RequestBody JobPositionDTO jobPositionDTO) {
-        JobPosition jobPosition = jobPositionService.addJobPosition(jobPositionDTO);
-        return ResponseEntity.ok(jobPosition);
+    public JobAddReturnMsg addJobPosition(@RequestBody JobAddDTO jobAddDTO) {
+        return jobPositionService.addJobPositionByJobAddDTO(jobAddDTO);
     }
 
     @PostMapping("/add-bulk")

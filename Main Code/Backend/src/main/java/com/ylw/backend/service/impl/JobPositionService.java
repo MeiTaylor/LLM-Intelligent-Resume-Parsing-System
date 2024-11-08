@@ -67,6 +67,28 @@ public class JobPositionService implements JobPositionServiceInterface {
         return departmentJobInfos;
     }
 
+
+    @Override
+    public JobAddReturnMsg addJobPositionByJobAddDTO(JobAddDTO jobAddDTO) {
+
+        Integer companyId = userRepository.findCompanyIdById(jobAddDTO.getUserId()).orElse(-1);
+
+        Optional<Company> company = companyRepository.findById(companyId);
+        if (company.isEmpty()) {
+            throw new IllegalArgumentException("Company not found with ID: " + companyId);
+        }
+        JobPosition jobPosition = new JobPosition();
+        jobPosition.setTitle(jobAddDTO.getTitle());
+        jobPosition.setDepartment(jobAddDTO.getDepartment());
+        jobPosition.setDescription(jobAddDTO.getDescription());
+        jobPosition.setMinimumWorkYears(jobAddDTO.getMinimumWorkYears());
+        jobPosition.setMinimumEducationLevel(jobAddDTO.getMinimumEducationLevel());
+        jobPosition.setCreatedDate(LocalDateTime.now());
+        jobPosition.setCompany(company.get());
+        jobPositionRepository.save(jobPosition);
+        return new JobAddReturnMsg(20000,"创建岗位成功");
+    }
+
     @Override
     public JobPosition addJobPosition(JobPositionDTO jobPositionDTO) {
         Optional<Company> company = companyRepository.findById(jobPositionDTO.getCompanyId());

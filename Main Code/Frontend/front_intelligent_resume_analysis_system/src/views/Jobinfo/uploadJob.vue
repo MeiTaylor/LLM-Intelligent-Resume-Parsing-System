@@ -74,6 +74,7 @@
     import { useUser } from '../../stores/user';
     import pinia from '../../stores';
     import axios from 'axios';
+    import { ElMessage } from 'element-plus';
 
     const jobInfoForm = reactive({
         jobName: '',
@@ -96,17 +97,21 @@
     const submit = () => {
 
         console.log(`output->jobInfoFormb`, jobInfoForm)
-        // axios.post('http://localhost:5177/api/Job/uploadJobs', {
-        //     userId: useUser().userId,
-        //     jobName: jobInfoForm.jobName,
-        //     jobDetails: jobInfoForm.JobDescription,
-        //     jobKeywords: jobInfoForm.majorRequire,
-        //     minimumWorkYears: jobInfoForm.workExperience,
-        //     minimumEducationLevel: jobInfoForm.educationRequire
-        // }).then((res) => {
-        //     console.log(res)
-        //     $router.push({ path: '/job-info' })
-        // })
+        axios.post('http://localhost:8080/api/jobposition/add', {
+            userId: useUser().userId,
+            title: jobInfoForm.jobName,
+            description: jobInfoForm.JobDescription,
+            minimumWorkYears: jobInfoForm.workExperience,
+            minimumEducationLevel: jobInfoForm.educationRequire,
+            department: "技术部"
+        }).then((res) => {
+            console.log(res)
+            if (res.data.code == 20000) {
+                ElMessage.success('新增成功')
+            } else {
+                ElMessage.error('新增失败')
+            }
+        })
     }
 
 </script>

@@ -8,8 +8,19 @@ def setup_resume_analysis_folders_and_files(base_path):
     parent_directory = os.path.dirname(base_path)
 
     # 需要创建的目录名称，排除了原始简历文件夹
+    # directories = [
+    #     "Text_Conversions", 
+    #     "Analysis_Results/Baidu_Analysis", 
+    #     "Analysis_Results/GPT_Talent_Portraits", 
+    #     "Analysis_Results/GPT_Job_Matching", 
+    #     "Analysis_Results/Prompt_Texts"
+    # ]
+
+
+    # 加上图片形式的简历
     directories = [
-        "Text_Conversions", 
+        "Conversions/Text_Conversions", 
+        "Conversions/Image_Conversions", 
         "Analysis_Results/Baidu_Analysis", 
         "Analysis_Results/GPT_Talent_Portraits", 
         "Analysis_Results/GPT_Job_Matching", 

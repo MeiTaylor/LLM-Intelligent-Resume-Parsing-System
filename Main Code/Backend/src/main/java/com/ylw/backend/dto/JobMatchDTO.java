@@ -1,15 +1,15 @@
-package com.ylw.backend.model;
+package com.ylw.backend.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.ylw.backend.model.ApplicantProfile;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.ToString;
 
 @Data
 @Entity
-@ToString(exclude = "applicantProfile")
-public class JobMatch {
+public class JobMatchDTO {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,10 +23,5 @@ public class JobMatch {
 
     @JsonProperty("人岗匹配的理由")
     private String reason;
-
-    @JsonIgnore
-    @ManyToOne
-    @JoinColumn(name = "applicant_profile_id")
-    private ApplicantProfile applicantProfile;
 
 }

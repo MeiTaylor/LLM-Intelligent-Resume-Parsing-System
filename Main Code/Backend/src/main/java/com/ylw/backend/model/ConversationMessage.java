@@ -13,9 +13,6 @@ public class ConversationMessage {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "conversation_id", insertable = false, updatable = false)
-    private int conversationId;
-
     @ManyToOne
     @JoinColumn(name = "conversation_id")
     private Conversation conversation;

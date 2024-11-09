@@ -1,6 +1,7 @@
 package com.ylw.backend.service.impl;
 
 import com.ylw.backend.config.PythonConfig;
+import com.ylw.backend.dto.ApplicantDTO;
 import com.ylw.backend.dto.BriefHomeResumeInfo;
 import com.ylw.backend.model.Applicant;
 import com.ylw.backend.model.JobPosition;
@@ -18,10 +19,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -126,6 +124,56 @@ public class ResumeService implements ResumeServiceInterface {
         applicantRepository.save(applicant);
         return applicant;
     }
+
+    @Override
+    public Applicant updateApplicant(ApplicantDTO updatedApplicant) {
+        // 查找现有的 Applicant
+        Optional<Applicant> optionalApplicant = applicantRepository.findById(updatedApplicant.getId());
+
+        if (optionalApplicant.isEmpty()) {
+            throw new RuntimeException("Applicant with ID " + updatedApplicant.getId() + " not found.");
+        }
+
+        Applicant existingApplicant = optionalApplicant.get();
+
+        // 更新 Applicant 的基本信息
+        existingApplicant.setName(updatedApplicant.getName());
+        existingApplicant.setEmail(updatedApplicant.getEmail());
+        existingApplicant.setPhoneNumber(updatedApplicant.getPhoneNumber());
+        existingApplicant.setAge(updatedApplicant.getAge());
+        existingApplicant.setGender(updatedApplicant.getGender());
+        existingApplicant.setJobIntention(updatedApplicant.getJobIntention());
+        existingApplicant.setHighestEducation(updatedApplicant.getHighestEducation());
+        existingApplicant.setMajor(updatedApplicant.getMajor());
+        existingApplicant.setGraduatedFrom(updatedApplicant.getGraduatedFrom());
+        existingApplicant.setGraduatedFromLevel(updatedApplicant.getGraduatedFromLevel());
+        existingApplicant.setSelfEvaluation(updatedApplicant.getSelfEvaluation());
+        existingApplicant.setTotalWorkYears(updatedApplicant.getTotalWorkYears());
+        existingApplicant.setWorkStability(updatedApplicant.getWorkStability());
+        existingApplicant.setWorkStabilityReason(updatedApplicant.getWorkStabilityReason());
+
+        // 显式地清空 Award 集合，然后设置新的集合
+        if (updatedApplicant.getAwards() != null) {
+            existingApplicant.getAwards().clear(); // 清空现有集合
+            existingApplicant.getAwards().addAll(updatedApplicant.getAwards()); // 添加新内容
+        }
+
+        // 显式地清空 WorkExperience 集合，然后设置新的集合
+        if (updatedApplicant.getWorkExperiences() != null) {
+            existingApplicant.getWorkExperiences().clear(); // 清空现有集合
+            existingApplicant.getWorkExperiences().addAll(updatedApplicant.getWorkExperiences()); // 添加新内容
+        }
+
+        // 显式地清空 SkillCertificate 集合，然后设置新的集合
+        if (updatedApplicant.getSkillCertificates() != null) {
+            existingApplicant.getSkillCertificates().clear(); // 清空现有集合
+            existingApplicant.getSkillCertificates().addAll(updatedApplicant.getSkillCertificates()); // 添加新内容
+        }
+
+        // 保存更新后的 Applicant
+        return applicantRepository.save(existingApplicant);
+    }
+
 
     /**
      * 内部方法：运行Python脚本并传递参数

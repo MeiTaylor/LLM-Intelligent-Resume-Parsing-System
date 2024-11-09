@@ -1,5 +1,7 @@
 package com.ylw.backend.controller;
 
+import com.ylw.backend.dto.ApplicantDTO;
+import com.ylw.backend.dto.JobMatchDTO;
 import com.ylw.backend.model.Applicant;
 import com.ylw.backend.service.ResumeServiceInterface;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +15,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.security.MessageDigest;
 import java.time.LocalDate;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/resume")
@@ -83,6 +86,18 @@ public class ResumeController {
         }
     }
 
+    @PutMapping("/updateApplicant")
+    public ResponseEntity<String> updateApplicant(@RequestBody ApplicantDTO updatedApplicant) {
+        try {
+            Applicant applicant = resumeService.updateApplicant(updatedApplicant);
+            return ResponseEntity.ok("更新成功");
+        } catch (Exception e) {
+            System.err.println("更新简历信息失败: " + e.getMessage());
+            return ResponseEntity.badRequest().body("更新失败: " + e.getMessage());
+        }
+    }
+
+
     @PostMapping("/test")
     public ResponseEntity<Applicant> test() {
         try {
@@ -110,5 +125,5 @@ public class ResumeController {
         return (lastIndexOfDot == -1) ? "" : fileName.substring(lastIndexOfDot + 1);
     }
 
-    
+
 }

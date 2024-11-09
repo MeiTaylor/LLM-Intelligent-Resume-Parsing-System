@@ -9,7 +9,6 @@ import java.util.List;
 import lombok.Data;
 
 @Data
-@Entity
 public class ApplicantDTO {
 
     @Id
@@ -44,16 +43,9 @@ public class ApplicantDTO {
 
     public String workStabilityReason; // 工作稳定性原因
 
-    // 关系映射 - 获奖荣誉
-    @OneToMany(mappedBy = "applicant", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Award> awards;
 
-    // 关系映射 - 工作经历
-    @OneToMany(mappedBy = "applicant", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<WorkExperience> workExperiences;
 
-    // 关系映射 - 技能证书
-    @OneToMany(mappedBy = "applicant", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SkillCertificate> skillCertificates;
-
 }

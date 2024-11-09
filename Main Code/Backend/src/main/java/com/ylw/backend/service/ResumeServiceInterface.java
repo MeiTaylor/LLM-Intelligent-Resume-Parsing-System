@@ -18,4 +18,5 @@ public interface ResumeServiceInterface {
     void createAndSaveResume(String resumePath, Applicant applicant, int jobId, int userId);
 
     Applicant updateApplicant(ApplicantDTO updatedApplicant);
+
 }

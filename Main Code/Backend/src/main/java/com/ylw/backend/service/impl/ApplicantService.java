@@ -2,7 +2,11 @@ package com.ylw.backend.service.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ylw.backend.dto.CharacteristicDTO;
+import com.ylw.backend.dto.JobMatchDTO;
 import com.ylw.backend.model.*;
+import com.ylw.backend.repository.CharacteristicRepository;
+import com.ylw.backend.repository.JobMatchRepository;
 import com.ylw.backend.service.ApplicantServiceInterface;
 import org.springframework.stereotype.Service;
 
@@ -14,9 +18,18 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class ApplicantService implements ApplicantServiceInterface {
+
+    private final JobMatchRepository jobMatchRepository;
+    private final CharacteristicRepository characteristicRepository;
+
+    public ApplicantService(JobMatchRepository jobMatchRepository, CharacteristicRepository characteristicRepository) {
+        this.jobMatchRepository = jobMatchRepository;
+        this.characteristicRepository = characteristicRepository;
+    }
 
     @Override
     public Applicant createApplicantFromJsonFile(String jsonFilePath) {
@@ -258,5 +271,77 @@ public class ApplicantService implements ApplicantServiceInterface {
             e.printStackTrace();
             throw new RuntimeException("Failed to read or parse JSON file: " + jsonFilePath, e);
         }
+    }
+
+    @Override
+    public List<JobMatchDTO> getPersonalJobMatchScore(int applicantId) {
+        // 从数据库获取指定申请人的信息
+        List<JobMatch> jobMatches = jobMatchRepository.findByApplicantProfileId(applicantId);
+        List<JobMatchDTO> jobMatchDTOs = new ArrayList<>();
+
+        for (JobMatch jobMatch : jobMatches) {
+            JobMatchDTO jobMatchDTO = new JobMatchDTO();
+            jobMatchDTO.setId(jobMatch.getId());
+            jobMatchDTO.setJobTitle(jobMatch.getJobTitle());
+            jobMatchDTO.setScore(jobMatch.getScore());
+            jobMatchDTO.setReason(jobMatch.getReason());
+            jobMatchDTOs.add(jobMatchDTO);
+        }
+
+        return jobMatchDTOs;
+    }
+
+    @Override
+    public List<CharacteristicDTO> getPersonalCharacteristics(int applicantId) {
+        // 从数据库获取指定申请人的信息
+        List<Characteristic> characteristics = characteristicRepository.findByApplicantProfileId(applicantId);
+
+        // 筛选出 catagory 为 "个人特性" 的 Characteristic
+        List<CharacteristicDTO> characteristicDTOs = characteristics.stream()
+                .filter(characteristic -> "个人特性".equals(characteristic.getCatagory()))
+                .map(characteristic -> new CharacteristicDTO(
+                        characteristic.getName(),
+                        characteristic.getScore(),
+                        characteristic.getReason()
+                ))
+                .collect(Collectors.toList());
+
+        return characteristicDTOs;
+    }
+
+    @Override
+    public List<CharacteristicDTO> getSkillsAndExperiences(int applicantId) {
+        // 从数据库获取指定申请人的信息
+        List<Characteristic> characteristics = characteristicRepository.findByApplicantProfileId(applicantId);
+
+        // 筛选出 catagory 为 "技能和经验" 的 Characteristic
+        List<CharacteristicDTO> characteristicDTOs = characteristics.stream()
+                .filter(characteristic -> "技能和经验".equals(characteristic.getCatagory()))
+                .map(characteristic -> new CharacteristicDTO(
+                        characteristic.getName(),
+                        characteristic.getScore(),
+                        characteristic.getReason()
+                ))
+                .collect(Collectors.toList());
+
+        return characteristicDTOs;
+    }
+
+    @Override
+    public List<CharacteristicDTO> getAchievementsAndHighlights(int applicantId) {
+        // 从数据库获取指定申请人的信息
+        List<Characteristic> characteristics = characteristicRepository.findByApplicantProfileId(applicantId);
+
+        // 筛选出 catagory 为 "成就和亮点评价" 的 Characteristic
+        List<CharacteristicDTO> characteristicDTOs = characteristics.stream()
+                .filter(characteristic -> "成就和亮点评价".equals(characteristic.getCatagory()))
+                .map(characteristic -> new CharacteristicDTO(
+                        characteristic.getName(),
+                        characteristic.getScore(),
+                        characteristic.getReason()
+                ))
+                .collect(Collectors.toList());
+
+        return characteristicDTOs;
     }
 }

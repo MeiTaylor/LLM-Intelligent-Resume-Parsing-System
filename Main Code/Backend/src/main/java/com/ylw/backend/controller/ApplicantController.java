@@ -1,10 +1,14 @@
 package com.ylw.backend.controller;
 
+import com.ylw.backend.dto.CharacteristicDTO;
+import com.ylw.backend.dto.JobMatchDTO;
 import com.ylw.backend.model.Applicant;
 import com.ylw.backend.service.ApplicantServiceInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/applicant")
@@ -35,13 +39,29 @@ public class ApplicantController {
                     .body("Failed to create applicant from JSON file: " + e.getMessage());
         }
     }
+
+    @PostMapping("/graph/PersonalJobMatchScore")
+    public ResponseEntity<List<JobMatchDTO>> getPersonalJobMatchScore(@RequestBody int applicantId) {
+        List<JobMatchDTO> jobMatchDTOList = applicantService.getPersonalJobMatchScore(applicantId);
+        return ResponseEntity.ok(jobMatchDTOList);
+    }
+
+    @PostMapping("/graph/PersonalCharacteristics")
+    public ResponseEntity<List<CharacteristicDTO>> getPersonalCharacteristics(@RequestBody int applicantId) {
+        List<CharacteristicDTO> characteristicDTOList = applicantService.getPersonalCharacteristics(applicantId);
+        return ResponseEntity.ok(characteristicDTOList);
+    }
+
+    @PostMapping("/graph/SkillsAndExperiences")
+    public ResponseEntity<List<CharacteristicDTO>> getSkillsAndExperiences(@RequestBody int applicantId) {
+        List<CharacteristicDTO> characteristicDTOList = applicantService.getSkillsAndExperiences(applicantId);
+        return ResponseEntity.ok(characteristicDTOList);
+    }
+
+    @PostMapping("/graph/AchievementsAndHighlights")
+    public ResponseEntity<List<CharacteristicDTO>> getAchievementsAndHighlights(@RequestBody int applicantId) {
+        List<CharacteristicDTO> characteristicDTOList = applicantService.getAchievementsAndHighlights(applicantId);
+        return ResponseEntity.ok(characteristicDTOList);
+    }
+
 }
-
-
-//package com.ylw.backend.controller;
-//
-//public class ApplicantController {
-//    //简历上传二次修改接口
-//
-//    //获取申请人分数信息接口
-//}

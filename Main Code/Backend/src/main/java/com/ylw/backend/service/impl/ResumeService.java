@@ -149,15 +149,31 @@ public class ResumeService implements ResumeServiceInterface {
         existingApplicant.setGraduatedFromLevel(updatedApplicant.getGraduatedFromLevel());
         existingApplicant.setSelfEvaluation(updatedApplicant.getSelfEvaluation());
         existingApplicant.setTotalWorkYears(updatedApplicant.getTotalWorkYears());
+        existingApplicant.setWorkStability(updatedApplicant.getWorkStability());
+        existingApplicant.setWorkStabilityReason(updatedApplicant.getWorkStabilityReason());
 
-        // 更新相关联的 Award、WorkExperience、SkillCertificate
-        existingApplicant.setAwards(updatedApplicant.getAwards());
-        existingApplicant.setWorkExperiences(updatedApplicant.getWorkExperiences());
-        existingApplicant.setSkillCertificates(updatedApplicant.getSkillCertificates());
+        // 显式地清空 Award 集合，然后设置新的集合
+        if (updatedApplicant.getAwards() != null) {
+            existingApplicant.getAwards().clear(); // 清空现有集合
+            existingApplicant.getAwards().addAll(updatedApplicant.getAwards()); // 添加新内容
+        }
+
+        // 显式地清空 WorkExperience 集合，然后设置新的集合
+        if (updatedApplicant.getWorkExperiences() != null) {
+            existingApplicant.getWorkExperiences().clear(); // 清空现有集合
+            existingApplicant.getWorkExperiences().addAll(updatedApplicant.getWorkExperiences()); // 添加新内容
+        }
+
+        // 显式地清空 SkillCertificate 集合，然后设置新的集合
+        if (updatedApplicant.getSkillCertificates() != null) {
+            existingApplicant.getSkillCertificates().clear(); // 清空现有集合
+            existingApplicant.getSkillCertificates().addAll(updatedApplicant.getSkillCertificates()); // 添加新内容
+        }
 
         // 保存更新后的 Applicant
         return applicantRepository.save(existingApplicant);
     }
+
 
     /**
      * 内部方法：运行Python脚本并传递参数

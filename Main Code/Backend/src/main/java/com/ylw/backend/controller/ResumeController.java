@@ -1,6 +1,7 @@
 package com.ylw.backend.controller;
 
 import com.ylw.backend.dto.ApplicantDTO;
+import com.ylw.backend.dto.JobMatchDTO;
 import com.ylw.backend.model.Applicant;
 import com.ylw.backend.service.ResumeServiceInterface;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.security.MessageDigest;
 import java.time.LocalDate;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/resume")
@@ -96,7 +98,6 @@ public class ResumeController {
     }
 
 
-
     @PostMapping("/test")
     public ResponseEntity<Applicant> test() {
         try {
@@ -124,5 +125,5 @@ public class ResumeController {
         return (lastIndexOfDot == -1) ? "" : fileName.substring(lastIndexOfDot + 1);
     }
 
-    
+
 }

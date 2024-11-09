@@ -1,6 +1,7 @@
 // ResumeServiceInterface.java
 package com.ylw.backend.service;
 
+import com.ylw.backend.dto.ApplicantDTO;
 import com.ylw.backend.model.Applicant;
 
 public interface ResumeServiceInterface {
@@ -15,4 +16,6 @@ public interface ResumeServiceInterface {
     Applicant parseResumeTest(String resumePath);
 
     void createAndSaveResume(String resumePath, Applicant applicant, int jobId, int userId);
+
+    Applicant updateApplicant(ApplicantDTO updatedApplicant);
 }

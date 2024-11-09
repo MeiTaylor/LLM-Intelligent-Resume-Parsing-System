@@ -14,9 +14,6 @@ public class Conversation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "resume_id", insertable = false, updatable = false)
-    private int resumeId;
-
     @ManyToOne
     @JoinColumn(name = "resume_id")
     private Resume resume;
@@ -24,6 +21,6 @@ public class Conversation {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    @OneToMany(mappedBy = "conversation", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "conversation", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ConversationMessage> messages;
 }

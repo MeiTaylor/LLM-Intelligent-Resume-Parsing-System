@@ -1,6 +1,7 @@
 package com.ylw.backend.service.impl;
 
 import com.ylw.backend.config.PythonConfig;
+import com.ylw.backend.dto.ApplicantDTO;
 import com.ylw.backend.dto.BriefHomeResumeInfo;
 import com.ylw.backend.model.Applicant;
 import com.ylw.backend.model.JobPosition;
@@ -18,10 +19,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -125,6 +123,40 @@ public class ResumeService implements ResumeServiceInterface {
         applicantService.parseJobMatchingJson(applicant.getApplicantProfile(), jsonFilePaths.get("GPT_Job_Matching"));
         applicantRepository.save(applicant);
         return applicant;
+    }
+
+    @Override
+    public Applicant updateApplicant(ApplicantDTO updatedApplicant) {
+        // 查找现有的 Applicant
+        Optional<Applicant> optionalApplicant = applicantRepository.findById(updatedApplicant.getId());
+
+        if (optionalApplicant.isEmpty()) {
+            throw new RuntimeException("Applicant with ID " + updatedApplicant.getId() + " not found.");
+        }
+
+        Applicant existingApplicant = optionalApplicant.get();
+
+        // 更新 Applicant 的基本信息
+        existingApplicant.setName(updatedApplicant.getName());
+        existingApplicant.setEmail(updatedApplicant.getEmail());
+        existingApplicant.setPhoneNumber(updatedApplicant.getPhoneNumber());
+        existingApplicant.setAge(updatedApplicant.getAge());
+        existingApplicant.setGender(updatedApplicant.getGender());
+        existingApplicant.setJobIntention(updatedApplicant.getJobIntention());
+        existingApplicant.setHighestEducation(updatedApplicant.getHighestEducation());
+        existingApplicant.setMajor(updatedApplicant.getMajor());
+        existingApplicant.setGraduatedFrom(updatedApplicant.getGraduatedFrom());
+        existingApplicant.setGraduatedFromLevel(updatedApplicant.getGraduatedFromLevel());
+        existingApplicant.setSelfEvaluation(updatedApplicant.getSelfEvaluation());
+        existingApplicant.setTotalWorkYears(updatedApplicant.getTotalWorkYears());
+
+        // 更新相关联的 Award、WorkExperience、SkillCertificate
+        existingApplicant.setAwards(updatedApplicant.getAwards());
+        existingApplicant.setWorkExperiences(updatedApplicant.getWorkExperiences());
+        existingApplicant.setSkillCertificates(updatedApplicant.getSkillCertificates());
+
+        // 保存更新后的 Applicant
+        return applicantRepository.save(existingApplicant);
     }
 
     /**

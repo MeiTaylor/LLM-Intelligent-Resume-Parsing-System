@@ -108,4 +108,6 @@ public class ResumeController {
         int lastIndexOfDot = fileName.lastIndexOf('.');
         return (lastIndexOfDot == -1) ? "" : fileName.substring(lastIndexOfDot + 1);
     }
+
+    
 }

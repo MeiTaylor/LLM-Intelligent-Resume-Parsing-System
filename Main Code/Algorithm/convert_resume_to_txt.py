@@ -18,7 +18,7 @@ import os
 
 def convert_resume_to_txt(input_resume_path):
     """
-    将简历文件转换为文本格式并保存到 'Text_Conversions' 目录中。
+    将简历文件转换为文本格式并保存到 'Conversions/Text_Conversions' 目录中。
     
     参数:
     - input_resume_path: 简历文件的路径。
@@ -27,7 +27,8 @@ def convert_resume_to_txt(input_resume_path):
     base_directory = os.path.dirname(os.path.dirname(input_resume_path))
 
     # 定义文本转换的输出目录
-    text_conversions_directory = os.path.join(base_directory, "Text_Conversions")
+    text_conversions_directory = os.path.join(base_directory, "Conversions/Text_Conversions")
+    image_conversions_directory = os.path.join(base_directory, "Conversions/Image_Conversions")
 
     # 确保文本转换目录存在
     os.makedirs(text_conversions_directory, exist_ok=True)
@@ -58,11 +59,20 @@ def convert_resume_to_txt(input_resume_path):
 
     else:
         raise ValueError("不支持的文件类型进行转换。")
+    
+    # image_conv_result = convert_docx_to_jpg_long(input_resume_path, image_conversions_directory)
+
+    convert_docx_to_image(input_resume_path, image_conversions_directory)
+
+    # if image_conv_result:
+    #     print(f"转换成功！图片路径: {image_conv_result}")
+    # else:
+    #     print("转换失败！")
 
 
 
 
-def convert_resume_to_txt_for_gpt_analysis(resume_path, text_conversions_dir="Text_Conversions"):
+def convert_resume_to_txt_for_gpt_analysis(resume_path, text_conversions_dir="Conversions/Text_Conversions"):
     # 获取文件扩展名
     _, file_extension = os.path.splitext(resume_path)
     file_extension = file_extension.lower()
@@ -70,7 +80,7 @@ def convert_resume_to_txt_for_gpt_analysis(resume_path, text_conversions_dir="Te
     # 构造文本文件的输出路径
     resume_filename_without_extension = os.path.basename(resume_path).split('.')[0]
     
-    # 更新这行代码，使其构造在上级目录的 Text_Conversions 下的路径
+    # 更新这行代码，使其构造在上级目录的 Conversions/Text_Conversions 下的路径
     resume_txt_path = os.path.join(os.path.dirname(os.path.dirname(resume_path)), text_conversions_dir, resume_filename_without_extension + ".txt")
 
     # 确保文本转换目录存在
@@ -254,59 +264,156 @@ def doc_to_txt(input_doc_path, output_txt_path):
 
 
 
-import os
-import tempfile
-from docx2pdf import convert
-from PIL import Image
-import fitz
-import time
+# import os
+# import tempfile
+# from docx2pdf import convert
+# from PIL import Image
+# import fitz
+# import time
 
-import shutil
+# import shutil
 
-def convert_docx_to_image(word_path, image_name):
+# def convert_docx_to_image(word_path, image_name):
 
-    # 创建一个临时副本
-    temp_word_path = tempfile.mktemp(suffix='.docx')
-    shutil.copy(word_path, temp_word_path)
+#     # 创建一个临时副本
+#     temp_word_path = tempfile.mktemp(suffix='.docx')
+#     shutil.copy(word_path, temp_word_path)
 
-    # 将 Word 文档转换为 PDF
-    pdf_path = tempfile.mktemp(suffix='.pdf')
-    convert(temp_word_path, pdf_path)
+#     # 将 Word 文档转换为 PDF
+#     pdf_path = tempfile.mktemp(suffix='.pdf')
+#     convert(temp_word_path, pdf_path)
 
-    # 将 PDF 转换为图像
-    pdfDoc = fitz.open(pdf_path)
-    images = []
-    for pg in range(pdfDoc.page_count):
-        page = pdfDoc[pg]
-        zoom_x = 1.33333333
-        zoom_y = 1.33333333
-        mat = fitz.Matrix(zoom_x, zoom_y)
-        pix = page.get_pixmap(matrix=mat, alpha=False)
-        mode = "RGBA" if pix.alpha else "RGB"
-        img = Image.frombytes(mode, [pix.width, pix.height], pix.samples)
-        images.append(img)
+#     # 将 PDF 转换为图像
+#     pdfDoc = fitz.open(pdf_path)
+#     images = []
+#     for pg in range(pdfDoc.page_count):
+#         page = pdfDoc[pg]
+#         zoom_x = 1.33333333
+#         zoom_y = 1.33333333
+#         mat = fitz.Matrix(zoom_x, zoom_y)
+#         pix = page.get_pixmap(matrix=mat, alpha=False)
+#         mode = "RGBA" if pix.alpha else "RGB"
+#         img = Image.frombytes(mode, [pix.width, pix.height], pix.samples)
+#         images.append(img)
 
-    # 关闭 PyMuPDF 对 PDF 文件的引用
-    pdfDoc.close()
+#     # 关闭 PyMuPDF 对 PDF 文件的引用
+#     pdfDoc.close()
 
-    # 清理生成的 PDF 文件和临时 Word 副本
-    os.remove(pdf_path)
-    os.remove(temp_word_path)
+#     # 清理生成的 PDF 文件和临时 Word 副本
+#     os.remove(pdf_path)
+#     os.remove(temp_word_path)
 
-    # 合并所有的图像
-    widths, heights = zip(*(i.size for i in images))
-    total_width = max(widths)
-    total_height = sum(heights)
+#     # 合并所有的图像
+#     widths, heights = zip(*(i.size for i in images))
+#     total_width = max(widths)
+#     total_height = sum(heights)
 
-    new_img = Image.new('RGB', (total_width, total_height))
+#     new_img = Image.new('RGB', (total_width, total_height))
 
-    y_offset = 0
-    for img in images:
-        new_img.paste(img, (0, y_offset))
-        y_offset += img.height
+#     y_offset = 0
+#     for img in images:
+#         new_img.paste(img, (0, y_offset))
+#         y_offset += img.height
 
-    # 保存图像
-    new_img.save(image_name)
+#     # 保存图像
+#     new_img.save(image_name)
+
+
+
+
+
+def convert_docx_to_image(docx_path, output_folder):
+    """
+    将Word文档转换为图片
+    
+    Args:
+        docx_path (str): Word文档的完整路径
+        output_folder (str): 输出图片的文件夹路径
+    
+    Returns:
+        str: 生成的图片路径
+    """
+    try:
+        # 验证输入路径
+        if not os.path.exists(docx_path):
+            raise FileNotFoundError(f"Word文件不存在: {docx_path}")
+        
+        # 确保输出文件夹存在
+        os.makedirs(output_folder, exist_ok=True)
+        
+        # 获取文件名（不含扩展名）
+        base_name = os.path.splitext(os.path.basename(docx_path))[0]
+        
+        # 创建完整的输出图片路径
+        image_path = os.path.join(output_folder, f"{base_name}.jpg")
+        
+        # 创建临时文件
+        temp_word_path = tempfile.mktemp(suffix='.docx')
+        temp_pdf_path = tempfile.mktemp(suffix='.pdf')
+        
+        try:
+            # 复制Word文档到临时位置
+            shutil.copy2(docx_path, temp_word_path)
+            
+            # 转换为PDF
+            print("正在转换为PDF...")
+            convert(temp_word_path, temp_pdf_path)
+            
+            # 使用PyMuPDF转换为图像
+            print("正在转换为图像...")
+            pdf_document = fitz.open(temp_pdf_path)
+            images = []
+            
+            for page_num in range(pdf_document.page_count):
+                page = pdf_document[page_num]
+                zoom_x = 1.33333333  # 增加分辨率
+                zoom_y = 1.33333333
+                mat = fitz.Matrix(zoom_x, zoom_y)
+                pix = page.get_pixmap(matrix=mat, alpha=False)
+                
+                # 转换为PIL图像
+                img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
+                images.append(img)
+            
+            # 关闭PDF文档
+            pdf_document.close()
+            
+            if images:
+                # 计算总高度和最大宽度
+                widths, heights = zip(*(i.size for i in images))
+                max_width = max(widths)
+                total_height = sum(heights)
+                
+                # 创建新图像
+                final_image = Image.new('RGB', (max_width, total_height))
+                
+                # 拼接所有页面
+                y_offset = 0
+                for img in images:
+                    final_image.paste(img, (0, y_offset))
+                    y_offset += img.height
+                
+                # 保存最终图像
+                final_image.save(image_path, 'JPEG', quality=95)
+                print(f"图像已保存至: {image_path}")
+                
+                return image_path
+            else:
+                raise Exception("没有页面被转换")
+            
+        finally:
+            # 清理临时文件
+            for temp_file in [temp_word_path, temp_pdf_path]:
+                if os.path.exists(temp_file):
+                    os.remove(temp_file)
+                    print(f"已删除临时文件: {temp_file}")
+    
+    except Exception as e:
+        print(f"转换过程中出错: {str(e)}")
+        raise
+
+
+
 
 
 
@@ -421,4 +528,107 @@ def convert_doc_to_image(input_doc_path, output_image_path):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import os
+from win32com import client
+from pdf2image import convert_from_path
+import pythoncom
+from PIL import Image
+import numpy as np
+
+def convert_docx_to_jpg_long(docx_path, output_folder):
+    """
+    将docx文件转换为单张长图片
+    
+    Args:
+        docx_path (str): docx文件的完整路径
+        output_folder (str): 输出图片的文件夹路径
+        
+    Returns:
+        str: 成功返回图片路径，失败返回None
+    """
+    try:
+        # 确保输入路径存在
+        if not os.path.exists(docx_path):
+            raise FileNotFoundError(f"Word文件不存在: {docx_path}")
+            
+        # 确保输出文件夹存在，如果不存在则创建
+        os.makedirs(output_folder, exist_ok=True)
+            
+        # 获取文件名（不含扩展名）
+        file_name = os.path.splitext(os.path.basename(docx_path))[0]
+        
+        # 创建临时PDF文件路径
+        pdf_path = os.path.join(output_folder, f"{file_name}_temp.pdf")
+        
+        try:
+            # 初始化COM环境
+            pythoncom.CoInitialize()
+            
+            # 转换DOCX为PDF
+            print("正在将DOCX转换为PDF...")
+            word = client.Dispatch("Word.Application")
+            doc = word.Documents.Open(docx_path)
+            doc.SaveAs(pdf_path, FileFormat=17)  # 17 represents PDF format
+            doc.Close()
+            word.Quit()
+            
+            # 转换PDF为图片
+            print("正在将PDF转换为图片...")
+            images = convert_from_path(pdf_path)
+            
+            if not images:
+                raise Exception("PDF转换失败，未生成图片")
+                
+            # 计算总高度和获取最大宽度
+            total_height = sum(img.size[1] for img in images)
+            max_width = max(img.size[0] for img in images)
+            
+            # 创建新的长图
+            long_image = Image.new('RGB', (max_width, total_height), 'white')
+            
+            # 垂直拼接图片
+            current_height = 0
+            for img in images:
+                # 确保每个图片宽度一致
+                if img.size[0] != max_width:
+                    img = img.resize((max_width, int(img.size[1] * max_width / img.size[0])))
+                
+                long_image.paste(img, (0, current_height))
+                current_height += img.size[1]
+            
+            # 保存最终的长图
+            jpg_path = os.path.join(output_folder, f"{file_name}.jpg")
+            long_image.save(jpg_path, 'JPEG', quality=95)
+            print(f"已保存长图: {jpg_path}")
+            
+            # 删除临时PDF文件
+            os.remove(pdf_path)
+            
+            return jpg_path
+            
+        except Exception as e:
+            raise Exception(f"转换过程出错: {str(e)}")
+            
+        finally:
+            # 清理COM环境
+            pythoncom.CoUninitialize()
+            
+    except Exception as e:
+        print(f"转换文件时出错: {str(e)}")
+        return None
 

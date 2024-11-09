@@ -68,6 +68,9 @@ def gpt_analyze_resume(resume_txt_path, prompt_filename):
     # 假设resume_txt_path位于'Text_Conversions'目录中
     # 我们需要向上跳两级以获取基本目录
     base_dir = os.path.dirname(os.path.dirname(resume_txt_path))
+    # 在此基础上再往上跳一级
+    base_dir = os.path.dirname(base_dir)
+
     
     # 构建提示文本的路径
     # 它位于'Analysis_Results/Prompt_Texts'中

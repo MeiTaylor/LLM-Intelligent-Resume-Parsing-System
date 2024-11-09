@@ -5,11 +5,10 @@
             <el-col :span="6" style="height:fit-content;">
                 <el-card style="margin-left: 10px; margin-top: 10px;">
                     <el-select v-model="selectJobId" placeholder="选择岗位" style="width: 100%;margin-bottom: 7px;">
-                        <el-option v-for="job in allJobList" :key="item.value" :label="item.label" :value="item.value"
-                            :disabled="item.disabled" />
+                        <el-option v-for="job in allJobList" :key="job.id" :label="job.name" :value="job.id" />
                     </el-select>
-                    <el-upload class="upload-demo" drag action="http://localhost:8080/api/resume/uploadResume"
-                        :on-error="handleUploadError">
+                    <el-upload class="upload-demo" drag action="#" :on-error="handleUploadError"
+                        :before-upload="beforeUpload">
                         <el-icon class="el-icon--upload"><upload-filled /></el-icon>
                         <div class="el-upload__text">
                             拖动 或者 <em>点击上传简历</em>
@@ -207,7 +206,7 @@
                             <el-button type="warning" @click="handleClose">
                                 关闭
                             </el-button>
-                            <el-button type="primary" @click="submitForm(ruleFormRef)">
+                            <el-button type="primary" @click="submitForm()">
                                 修改
                             </el-button>
                         </template>
@@ -226,6 +225,7 @@
     import { onMounted } from 'vue'
     import { useUser } from '../../stores/user';
     import { useRouter } from 'vue-router'
+    import { ElMessage } from 'element-plus'
     const manpicter = ref(new URL('@/assets/images/man.jpg', import.meta.url))
     const womanpicter = ref(new URL('@/assets/images/women.jpg', import.meta.url))
     const router = useRouter()
@@ -250,9 +250,9 @@
 
     const sencondemodify = ref(false)
     const selectJobId = ref()
-    const modifyResumeInfo = reactive()
+    const modifyResumeInfo = ref()
 
-    const allJobList = reactive([])
+    const allJobList = ref()
 
     //实现搜索功能
     const search = () => {
@@ -303,6 +303,15 @@
     //开局调用接口更新界面
     onMounted(async () => {
         console.log(`output->userStore.id`, userStore.userId)
+        //获取所有的岗位
+        axios.get('http://localhost:8080/api/jobposition/allJobNamesAndIds', {
+            params: {
+                userId: userStore.userId
+            }
+        }).then((res) => {
+            console.log(`output->res`, res)
+            allJobList.value = res.data
+        })
         //TODO: 这里的接口地址需要改成后端的接口地址
         // const res = await axios.post('https://mock.presstime.cn/mock/67275d10caf0b4e52f13f169/resume/all/resumes', {
         //     userId: userStore.userId
@@ -323,20 +332,24 @@
 
     //上传文件之前的钩子
     const beforeUpload = (file) => {
+        if (selectJobId.value === undefined) {
+            ElMessage.error('请先选择岗位')
+            return false
+        }
         console.log(`output->file`, file)
         const formData = new FormData()
         formData.append('file', file)
+        formData.append('jobId', selectJobId.value)
+        formData.append('userId', userStore.userId)
         formData.forEach((value, key) => console.log(key, value));  // 检查 FormData 内容
-
+        ElMessage.success('上传成功,正在解析简历')
         // formData['file'] = file
         console.log(`output->formData`, formData)
         axios.post('http://localhost:8080/api/resume/uploadResume', formData).then((res) => {
             console.log(`output->res`, res)
-            if (res.data.code == 20000) {
-                console.log(`output->上传文件成功`)
-            } else {
-                console.log(`output->上传文件失败`)
-            }
+            modifyResumeInfo.value = res.data
+            ElMessage.success('简历解析成功')
+            sencondemodify.value = true
         })
         return false;
     }
@@ -369,6 +382,7 @@
     //TODO:后面需要将这个接口发送到后端上传二次修改信息
     const submitForm = (ruleFormRef) => {
         console.log(`output->modifyResumeInfo`, modifyResumeInfo)
+        console.log(`正在修改简历`)
     }
 
     //关闭抽屉

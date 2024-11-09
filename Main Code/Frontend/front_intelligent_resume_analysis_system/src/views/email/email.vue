@@ -15,11 +15,11 @@
                             添加
                         </el-button>
                     </div>
-                    <el-table :data=" EmailData" style="width: 100%">
+                    <el-table :data=" EmailData" style="width: 100%;" max-height="250">
                         <el-table-column prop="emailAddress" label="Email" width="250" />
                         <el-table-column fixed="right" label="Operations" width="120">
                             <template #default="scope">
-                                <div v-if="scope.row.isSyncEnabled">
+                                <div v-if="scope.row.syncEnabled">
                                     <!-- 监听 -->
                                     <el-popconfirm @confirm="changeListen(scope.row)" @cancel="cancelDelete(scope.row)"
                                         title="确定取消监听该邮箱吗？">
@@ -70,7 +70,7 @@
                     <h3 style="margin-top: 3px;margin-bottom: 3px;">邮箱接收到的简历信息</h3>
 
                     <!-- 表格 存放邮箱监听的数据 -->
-                    <el-table :data="emailResumeData" style="width: 100%; height: 350px;margin-top: 20px;">
+                    <el-table :data="emailResumeData" style="width: 100%; height: 350px;margin-top: 20px; ">
                         <el-table-column prop="receivingEmail" label="接收邮箱" width="200" />
                         <el-table-column prop="sendingEmail" label="发件邮箱" width="200" />
                         <el-table-column prop="subject" label="邮箱标题" width="200" />
@@ -113,6 +113,7 @@
     import emailNewAdd from './emailNewAdd.vue'
     import { ref, reactive, onMounted } from 'vue'
     import { ElMessage } from 'element-plus'
+    import { useUser } from '../../stores/user';
     import axios from 'axios'
     const emailAddInfo = reactive({
         email: '',
@@ -137,6 +138,7 @@
         }
     ])
 
+    const userStore = useUser()
     // const EmailData = ref([
     //     {
     //         'emailAddress': '2016-05-03',
@@ -201,22 +203,19 @@
         //向后端发送post请求
         //请求参数
         const updateEmailInfo = {
-            'userId': row.userId,
-            'emailAddress': row.emailAddress,
-            'isSyncEnabled': !(row.isSyncEnabled),
-            'emailPassword': row.emailPassword
+            'emailId': row.emailId,
         }
         console.log(`output->updateEmailInfo`, updateEmailInfo)
-        axios.patch('http://localhost:5177/api/Email/updateEmailStatus', updateEmailInfo).then((res) => {
+        axios.post('http://localhost:8080/api/email/change/status', updateEmailInfo).then((res) => {
             console.log(`output->res`, res)
             ElMessage({
                 message: '邮箱监听状态修改成功',
                 type: 'success',
             })
-            if (row.isSyncEnabled) {
-                row.isSyncEnabled = false
+            if (row.syncEnabled) {
+                row.syncEnabled = false
             } else {
-                row.isSyncEnabled = true
+                row.syncEnabled = true
             }
         }).catch((err) => {
             console.log(`output->err`, err)
@@ -228,20 +227,32 @@
     const sendAddEmailInfo = () => {
         console.log('添加邮箱信息')
         const sendData = {
-            'userId': 1,
-            'emailAddress': emailAddInfo.email,
+            'userId': userStore.userId,
+            'email': emailAddInfo.email,
             'emailPassword': emailAddInfo.password,
-            'isSyncEnabled': true,
         }
         //向后端发送post请求
-        axios.post('http://localhost:5177/api/Email/addUserEmail', sendData).then((res) => {
-            EmailData.value.push(sendData)
-            console.log(`output->res`, res)
-            ElMessage({
-                message: '邮箱添加成功',
-                type: 'success',
-            })
-            dialogEmailAddVisible.value = false
+        axios.post('http://localhost:8080/api/email/add', sendData).then((res) => {
+            if (res.data.code == 20000) {
+                const addData = {
+                    "emailAddress": emailAddInfo.email,
+                    "syncEnabled": true,
+                    "emailId": res.data.emailId
+                }
+                EmailData.value.push(addData)
+                console.log(`output->res`, res)
+                ElMessage({
+                    message: '邮箱添加成功',
+                    type: 'success',
+                })
+                dialogEmailAddVisible.value = false
+            } else {
+                ElMessage({
+                    message: '该邮箱已存在,邮箱添加失败',
+                    type: 'error',
+                })
+            }
+
         }).catch((err) => {
             console.log(`output->err`, err)
         })
@@ -252,7 +263,7 @@
         console.log('获取所有邮箱信息')
         // console.log(this.userStore.userId)
         //使用axios向后端发送post请求
-        axios.post('http://localhost:5177/api/Email/getUserEmail', { 'id': 1 }).then((res) => {
+        axios.post('http://localhost:8080/api/email/get/all/email', { 'userId': userStore.userId }).then((res) => {
             console.log(`output->res`, res)
             EmailData.value = res.data
 

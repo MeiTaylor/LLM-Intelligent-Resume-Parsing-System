@@ -39,7 +39,7 @@ public class CompanyService implements CompanyServiceInterface {
             return infoForHomeModelClass;
         }
         int companyId = company.getId();
-        List<JobPosition> jobPositions = jobPositionRepository.findByCompany_Users_Id(userId);
+        List<JobPosition> jobPositions = jobPositionRepository.findByCompanyId(companyId);
         List<Resume> resumes = resumeRepository.findByCompanyId(userId);
         infoForHomeModelClass.totalResumes = resumes.size();
         infoForHomeModelClass.totalJobs = jobPositions.size();

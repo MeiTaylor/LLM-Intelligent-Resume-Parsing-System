@@ -68,21 +68,30 @@ public class ResumeService implements ResumeServiceInterface {
 
     @Override
     public Applicant parseResume(String resumePath) {
-        CompletableFuture.runAsync(() -> runPythonScript(resumePath), executorService)
-                .exceptionally(throwable -> {
-                    System.err.println("简历解析发生异常: " + throwable.getMessage());
-                    throwable.printStackTrace();
-                    return null;
-                });
-        // 根据Python脚本中的规则推导出生成的所有JSON文件路径
-        Map<String, String> jsonFilePaths = deriveJsonFilePaths(resumePath);
-        // 读取json文件内容，存数据库
-        Applicant applicant = applicantService.createApplicantFromJsonFile(jsonFilePaths.get("Basic_Resume_Analysis"));
-        applicantService.parseCharacteristicsJson(applicant.getApplicantProfile(), jsonFilePaths.get("GPT_Talent_Portraits"));
-        applicantService.parseJobMatchingJson(applicant.getApplicantProfile(), jsonFilePaths.get("GPT_Job_Matching"));
-        applicantRepository.save(applicant);
+        try {
+            CompletableFuture<Void> future = CompletableFuture.runAsync(() -> runPythonScript(resumePath), executorService)
+                    .exceptionally(throwable -> {
+                        System.err.println("简历解析发生异常: " + throwable.getMessage());
+                        throwable.printStackTrace();
+                        return null;
+                    });
 
-        return applicant;
+            future.get(); // 这里会等待 Python 脚本执行完成
+
+            // 根据Python脚本中的规则推导出生成的所有JSON文件路径
+            Map<String, String> jsonFilePaths = deriveJsonFilePaths(resumePath);
+            // 读取json文件内容，存数据库
+            Applicant applicant = applicantService.createApplicantFromJsonFile(jsonFilePaths.get("Basic_Resume_Analysis"));
+            applicantService.parseCharacteristicsJson(applicant.getApplicantProfile(), jsonFilePaths.get("GPT_Talent_Portraits"));
+            applicantService.parseJobMatchingJson(applicant.getApplicantProfile(), jsonFilePaths.get("GPT_Job_Matching"));
+            applicantRepository.save(applicant);
+
+            return applicant;
+        } catch (InterruptedException | ExecutionException e) {
+            System.err.println("简历解析过程中发生异常: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("简历解析过程中发生异常", e);
+        }
     }
 
     /**

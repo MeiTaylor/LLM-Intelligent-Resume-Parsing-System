@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class JobInfoForUpload {
+    int jobId;
     public String jobName;
     public int weekJobResumes;
     public int allJobResume;

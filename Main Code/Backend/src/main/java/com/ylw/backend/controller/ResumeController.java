@@ -31,7 +31,7 @@ public class ResumeController {
      * @return ResponseEntity<String>
      */
     @PostMapping("/uploadResume")
-    public ResponseEntity<?> parseResume(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<?> parseResume(@RequestParam("file") MultipartFile file, int jobId, int userId) {
         if (file == null || file.isEmpty()) {
             // 如果文件为空，返回错误代码和空申请人信息
             return ResponseEntity.badRequest().body("文件为空，无法上传");
@@ -72,7 +72,7 @@ public class ResumeController {
 
             // 你可以在这里调用简历解析服务，例如：
             Applicant applicant = resumeService.parseResume(filePath.toString());
-            resumeService.createAndSaveResume(filePath.toString(), applicant, 1, 1);
+            resumeService.createAndSaveResume(filePath.toString(), applicant, jobId, userId);
             // 返回成功的响应
             return ResponseEntity.ok(applicant);
         } catch (Exception e) {

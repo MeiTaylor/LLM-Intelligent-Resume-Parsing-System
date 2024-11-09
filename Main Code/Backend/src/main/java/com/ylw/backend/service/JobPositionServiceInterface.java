@@ -10,4 +10,6 @@ public interface JobPositionServiceInterface {
     JobPosition addJobPosition(JobPositionDTO jobPosition);
     JobAddReturnMsg addJobPositionByJobAddDTO(JobAddDTO jobAddDTO);
     List<JobResumeCount> getJobResumeCounts(int companyId);
+
+    List<JobNameIdDTO> getAllJobNamesAndIds(int userId);
 }

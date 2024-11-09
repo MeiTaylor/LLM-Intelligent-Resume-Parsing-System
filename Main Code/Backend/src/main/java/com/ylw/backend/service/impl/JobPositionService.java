@@ -56,7 +56,7 @@ public class JobPositionService implements JobPositionServiceInterface {
                                         .count();
                                 int allJobResume = jobPosition.getResumes().size();
 
-                                return new JobInfoForUpload(jobPosition.getTitle(), weekJobResumes, allJobResume);
+                                return new JobInfoForUpload(jobPosition.getId(), jobPosition.getTitle(), weekJobResumes, allJobResume);
                             })
                             .collect(Collectors.toList());
 
@@ -114,6 +114,16 @@ public class JobPositionService implements JobPositionServiceInterface {
 
         return jobPositions.stream()
                 .map(jp -> new JobResumeCount(jp.getTitle(), jp.getResumes().size()))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<JobNameIdDTO> getAllJobNamesAndIds(int userId) {
+        int companyId = userRepository.findCompanyIdById(userId).orElse(-1);
+        List<JobPosition> jobPositions = jobPositionRepository.findByCompanyId(companyId);
+
+        return jobPositions.stream()
+                .map(jp -> new JobNameIdDTO(jp.getId(), jp.getTitle()))
                 .collect(Collectors.toList());
     }
 }

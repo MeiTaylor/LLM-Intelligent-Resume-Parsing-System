@@ -30,8 +30,14 @@ public class JobpositionController {
         return jobPositionService.getJobInfo(userId);
     }
 
+    @GetMapping("/allJobNamesAndIds")
+    public ResponseEntity<List<JobNameIdDTO>> getAllJobNamesAndIds(@RequestParam int userId) {
+        List<JobNameIdDTO> jobNamesAndIds = jobPositionService.getAllJobNamesAndIds(userId);
+        return ResponseEntity.ok(jobNamesAndIds);
+    }
+
     @PostMapping("/add")
-    public JobAddReturnMsg addJobPosition(@RequestBody JobAddDTO jobAddDTO) {
+    public JobAddReturnMsg addJobPosition(@RequestParam JobAddDTO jobAddDTO) {
         return jobPositionService.addJobPositionByJobAddDTO(jobAddDTO);
     }
 

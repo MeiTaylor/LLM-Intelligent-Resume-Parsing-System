@@ -1,5 +1,6 @@
 package com.ylw.backend.controller;
 
+import com.ylw.backend.dto.ApplicantDTO;
 import com.ylw.backend.model.Applicant;
 import com.ylw.backend.service.ResumeServiceInterface;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,6 +83,19 @@ public class ResumeController {
             return ResponseEntity.badRequest().body(null);
         }
     }
+
+    @PutMapping("/updateApplicant")
+    public ResponseEntity<String> updateApplicant(@RequestBody ApplicantDTO updatedApplicant) {
+        try {
+            Applicant applicant = resumeService.updateApplicant(updatedApplicant);
+            return ResponseEntity.ok("更新成功");
+        } catch (Exception e) {
+            System.err.println("更新简历信息失败: " + e.getMessage());
+            return ResponseEntity.badRequest().body("更新失败: " + e.getMessage());
+        }
+    }
+
+
 
     @PostMapping("/test")
     public ResponseEntity<Applicant> test() {

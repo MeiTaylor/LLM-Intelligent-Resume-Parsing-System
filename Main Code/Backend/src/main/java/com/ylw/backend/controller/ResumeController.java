@@ -45,7 +45,8 @@ public class ResumeController {
             }
 
             // 设置文件存储根目录
-            String staticFileRoot = "D:\\JavaProject\\ResumeSystem\\Resume";
+            String staticFileRoot = "D:\\大学本科学习资料\\大四上\\大型软件设计\\resume";
+//            String staticFileRoot = "D:\\JavaProject\\ResumeSystem\\Resume";
 
             // 创建基于当前日期的文件存储路径
             LocalDate today = LocalDate.now();

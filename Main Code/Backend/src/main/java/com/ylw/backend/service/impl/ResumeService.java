@@ -11,7 +11,10 @@ import com.ylw.backend.repository.CompanyRepository;
 import com.ylw.backend.repository.JobPositionRepository;
 import com.ylw.backend.repository.ResumeRepository;
 import com.ylw.backend.service.ResumeServiceInterface;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import jakarta.annotation.PreDestroy;  // 添加这行导入
 
@@ -19,6 +22,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -103,7 +108,7 @@ public class ResumeService implements ResumeServiceInterface {
     public void createAndSaveResume(String resumePath, Applicant applicant, int jobId, int userId) {
         Resume resume = new Resume();
         resume.setFilePath(resumePath);
-        resume.setApplicant(applicant);
+            resume.setApplicant(applicant);
         //resume.setCreatedDate(LocalDateTime.now());
         resume.setJobPosition(jobPositionRepository.findById(jobId).orElse(null));
         resume.setCompany(companyRepository.findByUsers_Id(userId).orElse(null));
@@ -124,6 +129,40 @@ public class ResumeService implements ResumeServiceInterface {
         applicantRepository.save(applicant);
         return applicant;
     }
+
+    @Override
+    public Resource getResumeImage(int resumeId) {
+        try {
+            // 查找 Resume
+            Resume resume = resumeRepository.findById(resumeId)
+                    .orElseThrow(() -> new RuntimeException("Resume not found with ID: " + resumeId));
+
+            // 获取简历存储路径
+            String resumepath = resume.getFilePath();
+
+            // 根据简历路径解析出对应的图片路径
+            Path resumeFilePath = Paths.get(resumepath);
+            Path baseDir = resumeFilePath.getParent().getParent().resolve("Conversions/Image_Conversions");
+            String fileNameWithoutExtension = resumeFilePath.getFileName().toString().replaceFirst("\\.[^.]+$", "");
+
+            // 构建图片路径
+            Path imagePath = baseDir.resolve(fileNameWithoutExtension + ".jpg");
+
+            // 创建文件资源
+            Resource fileResource = new UrlResource(imagePath.toUri());
+            if (!fileResource.exists() || !fileResource.isReadable()) {
+                throw new RuntimeException("Image not found or not readable: " + imagePath);
+            }
+
+            return fileResource;
+
+        } catch (Exception e) {
+            System.err.println("获取文件发生异常: " + e.getMessage());
+            throw new RuntimeException("获取文件失败", e);
+        }
+    }
+
+
 
     @Override
     public Applicant updateApplicant(ApplicantDTO updatedApplicant) {

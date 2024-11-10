@@ -3,6 +3,7 @@ package com.ylw.backend.service;
 
 import com.ylw.backend.dto.ApplicantDTO;
 import com.ylw.backend.model.Applicant;
+import org.springframework.core.io.Resource;
 
 public interface ResumeServiceInterface {
     /**
@@ -16,6 +17,8 @@ public interface ResumeServiceInterface {
     Applicant parseResumeTest(String resumePath);
 
     void createAndSaveResume(String resumePath, Applicant applicant, int jobId, int userId);
+
+    Resource getResumeImage(int resumeId);
 
     Applicant updateApplicant(ApplicantDTO updatedApplicant);
 

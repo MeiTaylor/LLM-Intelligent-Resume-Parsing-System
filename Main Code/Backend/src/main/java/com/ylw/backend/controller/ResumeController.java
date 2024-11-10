@@ -3,9 +3,13 @@ package com.ylw.backend.controller;
 import com.ylw.backend.dto.ApplicantDTO;
 import com.ylw.backend.dto.JobMatchDTO;
 import com.ylw.backend.model.Applicant;
+import com.ylw.backend.model.Resume;
 import com.ylw.backend.service.ResumeServiceInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -88,6 +92,30 @@ public class ResumeController {
             return ResponseEntity.badRequest().body(null);
         }
     }
+
+    @GetMapping("/getGraph")
+    public ResponseEntity<Resource> getFile(@RequestParam int resumeId) {
+        try {
+            Resource fileResource = resumeService.getResumeImage(resumeId);
+
+            // 获取 MIME 类型
+            String mimeType = Files.probeContentType(fileResource.getFile().toPath());
+            if (mimeType == null) {
+                mimeType = "application/octet-stream";
+            }
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(mimeType))
+                    .body(fileResource);
+
+        } catch (Exception e) {
+            System.err.println("获取文件发生异常: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    //返回applicantid对应的简历图片
+
 
     @PostMapping("/updateApplicant")
     public ResponseEntity<String> updateApplicant(@RequestBody ApplicantDTO updatedApplicant) {

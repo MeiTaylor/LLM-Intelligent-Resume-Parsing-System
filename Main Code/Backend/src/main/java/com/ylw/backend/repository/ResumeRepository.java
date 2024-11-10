@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Repository
@@ -17,8 +18,6 @@ public interface ResumeRepository extends JpaRepository<Resume, Integer> {
 
     @EntityGraph(attributePaths = {"applicant", "company"})
     List<Resume> findByCompanyId(int companyId);
-
-    Resume findById(int id);
 
     //这个是用来返回首页的简历信息内容
     default List<BriefHomeResumeInfo> findResumeHistoryByCompanyId(int companyId) {

@@ -8,6 +8,9 @@ import java.util.List;
 public interface JobPositionServiceInterface {
     List<DepartmentJobInfo> getJobInfo(int userId);
     JobPosition addJobPosition(JobPositionDTO jobPosition);
+
+    GraphForJobResumeCountModelClass ForJobResumeCount(int userId);
+
     JobAddReturnMsg addJobPositionByJobAddDTO(JobAddDTO jobAddDTO);
     List<JobResumeCount> getJobResumeCounts(int companyId);
 

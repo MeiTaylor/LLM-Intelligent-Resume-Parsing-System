@@ -67,6 +67,27 @@ public class JobPositionService implements JobPositionServiceInterface {
         return departmentJobInfos;
     }
 
+    @Override
+    public GraphForJobResumeCountModelClass ForJobResumeCount(int userId) {
+        int companyId = userRepository.findCompanyIdById(userId).orElse(-1);
+        List<JobPosition> jobPositions = jobPositionRepository.findByCompanyId(companyId);
+
+        if (jobPositions == null || jobPositions.isEmpty()) {
+            return new GraphForJobResumeCountModelClass();
+        }
+
+        int totalResumes = jobPositions.stream()
+                .mapToInt(jobPosition -> jobPosition.getResumes().size())
+                .sum();
+
+        List<JobResumeCount> jobResumeCounts = jobPositions.stream()
+                .map(jobPosition -> new JobResumeCount(jobPosition.getTitle(), jobPosition.getResumes().size()))
+                .collect(Collectors.toList());
+
+        return new GraphForJobResumeCountModelClass(totalResumes, jobResumeCounts);
+
+    }
+
 
     @Override
     public JobAddReturnMsg addJobPositionByJobAddDTO(JobAddDTO jobAddDTO) {

@@ -1,9 +1,12 @@
 package com.ylw.backend.model;
 
 import jakarta.persistence.*;
+import lombok.Data;
+
 import java.util.List;
 
 @Entity
+@Data
 public class UserEmail {
 
     @Id

@@ -16,7 +16,7 @@ public interface JobPositionRepository extends JpaRepository<JobPosition, Intege
     List<JobPosition> findByCompany_Users_Id(int userId);
 
     // 加载 JobPosition 时自动加载 resumes
-    @EntityGraph(attributePaths = "resume")
+    @EntityGraph(attributePaths = "resumes")
     List<JobPosition> findWithResumesByCompany_Id(int companyId);
 
 }

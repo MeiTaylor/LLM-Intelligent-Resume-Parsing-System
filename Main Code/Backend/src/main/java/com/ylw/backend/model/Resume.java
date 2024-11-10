@@ -5,9 +5,11 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 @Data
 @Entity
+@ToString(exclude = {"company", "jobPosition"})
 public class Resume {
 
     @Id

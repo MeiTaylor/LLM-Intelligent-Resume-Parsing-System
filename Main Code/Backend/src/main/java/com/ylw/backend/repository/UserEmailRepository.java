@@ -1,5 +1,6 @@
 package com.ylw.backend.repository;
 
+import com.ylw.backend.dto.EmailReceiveResumeInfo;
 import com.ylw.backend.model.UserEmail;
 import jakarta.persistence.Id;
 import jakarta.transaction.Transactional;
@@ -21,4 +22,7 @@ public interface UserEmailRepository extends JpaRepository<UserEmail,Integer> {
     //根据id查出对应的状态
     Optional<UserEmail> findById(int id);
 
+    // 查询邮箱接收简历信息的四表联查
+    @Query("SELECT new com.ylw.backend.dto.EmailReceiveResumeInfo(u.emailAddress,emsg.sender,emsg.subject   ,a.name,a.jobIntention,emsg.receivedDate) FROM UserEmail u, EmailMessage emsg, Applicant a WHERE u.userId = :userId AND u.id = emsg.userEmailId AND emsg.resumeId = a.id")
+    List<EmailReceiveResumeInfo> findEmailReceiveInfoByUserId(@Param("userId") int userId);
 }

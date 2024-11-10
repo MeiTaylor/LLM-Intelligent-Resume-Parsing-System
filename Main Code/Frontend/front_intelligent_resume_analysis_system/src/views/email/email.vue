@@ -71,12 +71,12 @@
 
                     <!-- 表格 存放邮箱监听的数据 -->
                     <el-table :data="emailResumeData" style="width: 100%; height: 350px;margin-top: 20px; ">
-                        <el-table-column prop="receivingEmail" label="接收邮箱" width="200" />
-                        <el-table-column prop="sendingEmail" label="发件邮箱" width="200" />
-                        <el-table-column prop="subject" label="邮箱标题" width="200" />
+                        <el-table-column prop="receiveEmail" label="接收邮箱" width="200" />
+                        <el-table-column prop="sendEmail" label="发件邮箱" width="200" />
+                        <el-table-column prop="emailTitle" label="邮箱标题" width="200" />
                         <el-table-column prop="applicantName" label="求职者名称" width="200" />
-                        <el-table-column prop="desiredPosition" label="意向岗位" width="200" />
-                        <el-table-column prop="receivedDate" label="时间" />
+                        <el-table-column prop="intentionJob" label="意向岗位" width="200" />
+                        <el-table-column prop="receiveDate" label="时间" />
                     </el-table>
 
                 </ElCard>
@@ -178,13 +178,22 @@
             'userEmailId': row.id,
         }
         console.log(`output->deleteEmailInfo`, deleteEmailInfo)
-        axios.delete('http://localhost:5177/api/Email/deleteUserEmail?userEmailId=' + row.id).then((res) => {
+        axios.post('http://localhost:8080/api/email/delete/email', {
+            "emailId": row.emailId
+        }).then((res) => {
             console.log(`output->res`, res)
-            ElMessage({
-                message: '邮箱删除成功',
-                type: 'success',
-            })
-            EmailData.value.splice(EmailData.value.indexOf(row), 1)
+            if (res.data.code == 20000) {
+                ElMessage({
+                    message: '邮箱删除成功',
+                    type: 'success',
+                })
+                EmailData.value.splice(EmailData.value.indexOf(row), 1)
+            } else {
+                ElMessage({
+                    message: '邮箱删除失败',
+                    type: 'error',
+                })
+            }
         }).catch((err) => {
             console.log(`output->err`, err)
         })
@@ -275,10 +284,10 @@
 
     const getAllResumeInfo = () => {
         console.log('获取所有简历信息')
-        //使用axios向后端发送post请求
-        axios.get('http://localhost:5177/api/Email/getEmailSummaries?userId=1').then((res) => {
+        //使用axios向后端发送post请求 TODO
+        axios.post('http://localhost:8080/api/email/get/all/email/receive/resume/info', { 'userId': userStore.userId }).then((res) => {
             console.log(`output->res`, res)
-            // emailResumeData.value = res.data
+            emailResumeData.value = res.data
             // emailResumeData.value = ref([
             //     {
             //         email: 'abcddfefzs@qq.com',

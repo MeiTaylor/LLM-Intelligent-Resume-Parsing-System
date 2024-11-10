@@ -3,6 +3,7 @@ package com.ylw.backend.service.impl;
 import com.ylw.backend.dto.AllEmailInfo;
 import com.ylw.backend.dto.EmailAddInfo;
 import com.ylw.backend.dto.CommonReturn;
+import com.ylw.backend.dto.EmailReceiveResumeInfo;
 import com.ylw.backend.model.User;
 import com.ylw.backend.model.UserEmail;
 import com.ylw.backend.repository.UserEmailRepository;
@@ -71,5 +72,21 @@ public class EmailService implements EmailServiceInterface {
        }
 
         return new  CommonReturn(20000,"修改成功！");
+    }
+
+    @Override
+    public CommonReturn deleteEmail(int emailId) {
+        try {
+            userEmailRepository.deleteById(emailId);
+        }catch (Exception e){
+            return new CommonReturn(50000,"删除邮箱失败！");
+        }
+        return new CommonReturn(20000,"删除邮箱成功！");
+    }
+
+    @Override
+    public List<EmailReceiveResumeInfo> fondAllEmailReceiveResumeInfo(int userId) {
+
+        return userEmailRepository.findEmailReceiveInfoByUserId(userId);
     }
 }

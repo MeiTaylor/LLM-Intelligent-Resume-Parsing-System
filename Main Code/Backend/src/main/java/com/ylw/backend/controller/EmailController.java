@@ -37,4 +37,16 @@ public class EmailController {
         System.out.println(webSentEmailId);
         return emailService.changeEmailStatus(webSentEmailId.getEmailId());
     }
+
+    @PostMapping("/delete/email")
+    public CommonReturn deleteEmail(@RequestBody WebSentEmailId webSentEmailId) {
+        System.out.println(webSentEmailId);
+        return emailService.deleteEmail(webSentEmailId.getEmailId());
+    }
+
+    @PostMapping("get/all/email/receive/resume/info")
+    public List<EmailReceiveResumeInfo> getAllEmailReceiveResumeInfo(@RequestBody WebSentUserId webSentUserId) {
+        System.out.println(webSentUserId);
+        return emailService.fondAllEmailReceiveResumeInfo(webSentUserId.getUserId());
+    }
 }

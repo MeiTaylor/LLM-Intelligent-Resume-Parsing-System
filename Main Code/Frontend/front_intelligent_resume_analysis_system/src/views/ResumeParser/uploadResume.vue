@@ -356,17 +356,17 @@
 
     // 更新奖项名称
     const updateAward = (index, name) => {
-        modifyResumeInfo.awards[index].awardName = name;
+        modifyResumeInfo.value.awards[index].awardName = name;
     };
 
     // 更新技能名称
     const updateSkillCertificate = (index, name) => {
-        modifyResumeInfo.skillCertificates[index].skillName = name;
+        modifyResumeInfo.value.skillCertificates[index].skillName = name;
     };
 
     // 更新工作经历信息
     const updateExperience = (index, field, value) => {
-        modifyResumeInfo.workExperiences[index][field] = value;
+        modifyResumeInfo.value.workExperiences[index][field] = value;
     };
 
 
@@ -381,8 +381,17 @@
 
     //TODO:后面需要将这个接口发送到后端上传二次修改信息
     const submitForm = (ruleFormRef) => {
-        console.log(`output->modifyResumeInfo`, modifyResumeInfo)
+        console.log(`output->modifyResumeInfo`, modifyResumeInfo.value)
         console.log(`正在修改简历`)
+        axios.post('http://localhost:8080/api/resume/updateApplicant', modifyResumeInfo.value).then((res) => {
+            console.log(`output->res`, res)
+            if (res.data === "更新成功") {
+                ElMessage.success('更新成功')
+                sencondemodify.value = false
+            } else {
+                ElMessage.error('更新失败')
+            }
+        })
     }
 
     //关闭抽屉

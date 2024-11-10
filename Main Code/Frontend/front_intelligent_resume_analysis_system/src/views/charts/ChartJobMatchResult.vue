@@ -36,14 +36,14 @@
                 var option;
 
 
-                axios.post('http://localhost:5177/api/Resume/graph/PersonalJobMatchScore', { Id: this.userId })
+                axios.post('http://localhost:5177/api/Resume/graph/PersonalJobMatchScore', this.userId)
                     .then(response => {
                         console.log(response.data);
                         var data = response.data;
                         console.log(data);
 
                         //将返回的数据赋予给data
-                        for (var i = 0; i < 10; i++) {
+                        for (var i = 0; i < 6; i++) {
                             this.tableData.push({ name: data[i].jobTitle, score: data[i].score, reason: data[i].reason })
                         }
 
@@ -51,43 +51,29 @@
 
 
                         //将这个动态赋值
-                        for (var i = 0; i < 10; i++) {
-                            if (data[i].jobTitle === "产品运营") { scoreData.push(data[i].score); }
+                        for (var i = 0; i < 6; i++) {
+                            if (data[i].jobTitle === "产品运营/电商运营") { scoreData.push(data[i].score); }
                         }
-                        for (var i = 0; i < 10; i++) {
+                        for (var i = 0; i < 6; i++) {
 
-                            if (data[i].jobTitle === "平面设计师") { scoreData.push(data[i].score); continue; }
+                            if (data[i].jobTitle === "设计与创意") { scoreData.push(data[i].score); continue; }
                         }
-                        for (var i = 0; i < 10; i++) {
-                            if (data[i].jobTitle === "财务") { scoreData.push(data[i].score); continue; }
-
-                        }
-                        for (var i = 0; i < 10; i++) {
-                            if (data[i].jobTitle === "市场营销") { scoreData.push(data[i].score); }
-                        }
-                        for (var i = 0; i < 10; i++) {
-
-                            if (data[i].jobTitle === "项目主管") { scoreData.push(data[i].score); continue; }
-                        }
-                        for (var i = 0; i < 10; i++) {
-                            if (data[i].jobTitle === "开发工程师") { scoreData.push(data[i].score); continue; }
+                        for (var i = 0; i < 6; i++) {
+                            if (data[i].jobTitle === "财务/风控专员") { scoreData.push(data[i].score); continue; }
 
                         }
-                        for (var i = 0; i < 10; i++) {
-                            if (data[i].jobTitle === "文员") { scoreData.push(data[i].score); }
+                        for (var i = 0; i < 6; i++) {
+                            if (data[i].jobTitle === "市场营销/项目主管") { scoreData.push(data[i].score); }
                         }
-                        for (var i = 0; i < 10; i++) {
+                        for (var i = 0; i < 6; i++) {
 
-                            if (data[i].jobTitle === "电商运营") { scoreData.push(data[i].score); continue; }
+                            if (data[i].jobTitle === "技术开发") { scoreData.push(data[i].score); continue; }
                         }
-                        for (var i = 0; i < 10; i++) {
-                            if (data[i].jobTitle === "人力资源管理") { scoreData.push(data[i].score); continue; }
-
-                        }
-                        for (var i = 0; i < 10; i++) {
-                            if (data[i].jobTitle === "风控专员") { scoreData.push(data[i].score); continue; }
+                        for (var i = 0; i < 6; i++) {
+                            if (data[i].jobTitle === "行政支持") { scoreData.push(data[i].score); continue; }
 
                         }
+
                         option = {
                             title: {
                                 text: '人岗匹配得分'
@@ -109,16 +95,13 @@
                             },
                             radar: {
                                 indicator: [
-                                    { name: '产品运营', max: 100 },
-                                    { name: '平面设计师', max: 100 },
-                                    { name: '财务', max: 100 },
-                                    { name: '市场营销', max: 100 },
-                                    { name: '项目主管', max: 100 },
-                                    { name: '开发工程师', max: 100 },
-                                    { name: '文员', max: 100 },
-                                    { name: '电商运营', max: 100 },
-                                    { name: '人力资源管理', max: 100 },
-                                    { name: '风控专员', max: 100 },
+                                    { name: '产品运营/电商运营', max: 100 },
+                                    { name: '设计与创意', max: 100 },
+                                    { name: '财务/风控专员', max: 100 },
+                                    { name: '市场营销/项目主管', max: 100 },
+                                    { name: '技术开发', max: 100 },
+                                    { name: '行政支持', max: 100 },
+
 
                                 ],
                                 center: ['50%', '50%'],

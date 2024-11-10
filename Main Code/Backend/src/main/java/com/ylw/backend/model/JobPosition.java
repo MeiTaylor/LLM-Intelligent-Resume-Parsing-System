@@ -34,11 +34,6 @@ public class JobPosition {
     @JoinColumn(name = "company_id")
     private Company company;
 
-    @ManyToMany
-    @JoinTable(
-            name = "job_position_resume",
-            joinColumns = @JoinColumn(name = "job_position_id"),
-            inverseJoinColumns = @JoinColumn(name = "resume_id")
-    )
+    @OneToMany(mappedBy = "jobPosition", cascade = CascadeType.ALL)
     private List<Resume> resumes;
 }

@@ -20,7 +20,7 @@
                 const chartDom = this.$refs.chart;
                 const myChart = echarts.init(chartDom);
                 var option;
-                axios.post('http://localhost:5177/api/Home/statistics', { id: this.userId })
+                axios.post('http://localhost:8080/api/home/statistics', { userId: this.userId })
                     .then(response => {
                         console.log(response);
 
@@ -31,10 +31,10 @@
                         var JobAddData = []//岗位的图表
 
                         //先获取对应的x坐标数据
-                        for (var i = 0; i < data.jobCounts.length; i++) {
-                            xData.push(data.jobCounts[i].date)
-                            JobAddData.push(data.jobCounts[i].count);//改变的是job对应的
-                            ResumeAddData.push(data.resumeCounts[i].count)
+                        for (var i = 0; i < data.jobCountList.length; i++) {
+                            xData.push(data.jobCountList[i].date)
+                            JobAddData.push(data.jobCountList[i].count);//改变的是job对应的
+                            ResumeAddData.push(data.resumeCountList[i].count)
 
                         }
 

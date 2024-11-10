@@ -33,13 +33,14 @@
 
 
                 //获取后端对应的数据
-                axios.post('http://localhost:5177/api/Resume/graph/total', { id: this.userId })//此时的userid需要外界传入
+                axios.post('http://localhost:8080/api/home/statistics', { userId: this.userId })//此时的userid需要外界传入
                     .then(response => {
                         console.log(response.data)
                         let xAxisData = []//数组名称
                         let EmptyData = []//空柱的高度
                         let RealData = []//真实柱的高度
                         const responseData = response.data;
+
                         //添加第一行的
                         xAxisData.push('totalResumes')
                         EmptyData.push(0)
@@ -52,7 +53,7 @@
                         //遍历数组
                         jobResumeCounts.forEach((element) => {
                             xAxisData.push(element.jobName)
-                            RealData.push(element.resumeCount)
+                            RealData.push(element.resumecount)
                             let myEmptyData = 2 * totalResumes
                             RealData.forEach((e) => { myEmptyData = myEmptyData - e })
                             //myEmptyData = myEmptyData - element.resumeCount

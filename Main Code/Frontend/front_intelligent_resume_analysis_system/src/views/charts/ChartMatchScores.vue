@@ -18,7 +18,11 @@
                 const chartDom = this.$refs.chart;
                 const myChart = echarts.init(chartDom);
                 var option;
-                axios.post('http://localhost:5177/api/Resume/graph/JobMatchScore', { id: this.userId })
+                axios.post('http://localhost:8080/api/applicant/graph/PersonalJobMatchScore', this.userId, {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
                     .then(response => {
                         console.log(response.data);
                         var data = response.data.jobMatchScores;

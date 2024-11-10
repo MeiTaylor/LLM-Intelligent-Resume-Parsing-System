@@ -1,5 +1,6 @@
 package com.ylw.backend.repository;
 
+import com.ylw.backend.dto.EmailMoniterInfo;
 import com.ylw.backend.dto.EmailReceiveResumeInfo;
 import com.ylw.backend.model.UserEmail;
 import jakarta.persistence.Id;
@@ -25,4 +26,8 @@ public interface UserEmailRepository extends JpaRepository<UserEmail,Integer> {
     // 查询邮箱接收简历信息的四表联查
     @Query("SELECT new com.ylw.backend.dto.EmailReceiveResumeInfo(u.emailAddress,emsg.sender,emsg.subject   ,a.name,a.jobIntention,emsg.receivedDate) FROM UserEmail u, EmailMessage emsg, Applicant a WHERE u.userId = :userId AND u.id = emsg.userEmailId AND emsg.resumeId = a.id")
     List<EmailReceiveResumeInfo> findEmailReceiveInfoByUserId(@Param("userId") int userId);
+
+    //查看所有简可以正确监听信息的简历
+    @Query("SELECT new com.ylw.backend.dto.EmailMoniterInfo(u.id,u.userId,u.emailAddress,u.emailPassword) FROM UserEmail u WHERE u.isSyncEnabled = :syncEnabled")
+    List<EmailMoniterInfo> findEmailBySyncEnabled(Boolean syncEnabled);
 }

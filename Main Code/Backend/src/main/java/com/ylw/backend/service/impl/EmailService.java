@@ -56,12 +56,6 @@ public class EmailService implements EmailServiceInterface {
             // 3. 保存到数据库
             UserEmail savedEmail = userEmailRepository.save(userEmail);
 
-            // 4. 启动邮箱监控
-            emailUtils.startMonitor(
-                    savedEmail.getId(),
-                    savedEmail.getEmailAddress(),
-                    savedEmail.getEmailPassword()
-            );
 
             return new CommonReturn(20000, "创建成功", savedEmail.getId());
         } catch (Exception e) {
@@ -79,7 +73,6 @@ public class EmailService implements EmailServiceInterface {
             allEmailInfo.setEmailId(userEmail.getId());
             allEmailInfo.setSyncEnabled(userEmail.isSyncEnabled());
             // 检查是否正在监控
-            allEmailInfo.setSyncEnabled(emailUtils.isMonitoring(userEmail.getId()));
             allEmailInfos.add(allEmailInfo);
         }
         return allEmailInfos;
@@ -97,17 +90,6 @@ public class EmailService implements EmailServiceInterface {
         boolean newStatus = !userEmail.isSyncEnabled();
         userEmail.setSyncEnabled(newStatus);
         userEmailRepository.save(userEmail);
-
-        // 根据新状态启动或停止监控
-        if (newStatus) {
-            emailUtils.startMonitor(
-                    emailId,
-                    userEmail.getEmailAddress(),
-                    userEmail.getEmailPassword()
-            );
-        } else {
-            emailUtils.stopMonitor(emailId);
-        }
 
         return new CommonReturn(20000, "修改成功！");
     }

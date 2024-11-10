@@ -5,6 +5,8 @@ import com.ylw.backend.dto.JobMatchDTO;
 import com.ylw.backend.model.Applicant;
 import com.ylw.backend.model.Resume;
 import com.ylw.backend.service.ResumeServiceInterface;
+import com.ylw.backend.service.impl.EmailMoniterSercive;
+import com.ylw.backend.service.impl.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -27,12 +29,14 @@ import java.util.List;
 public class ResumeController {
 
     private final ResumeServiceInterface resumeService;
+    private final EmailMoniterSercive emailMoniterSercive;
     @Value("${resume.file.root}")
     private String staticFileRoot;
 
     @Autowired
-    public ResumeController(ResumeServiceInterface resumeService) {
+    public ResumeController(ResumeServiceInterface resumeService, EmailMoniterSercive emailMoniterSercive) {
         this.resumeService = resumeService;
+        this.emailMoniterSercive = emailMoniterSercive;
     }
 
     /**
@@ -130,15 +134,18 @@ public class ResumeController {
 
 
     @PostMapping("/test")
-    public ResponseEntity<Applicant> test() {
-        try {
-            Applicant applicant = resumeService.parseResumeTest("D:\\JavaProject\\ResumeSystem\\Resume\\1.docx");
-            return ResponseEntity.ok(applicant);
-        } catch (Exception e) {
-            // 返回错误信息
-            System.err.println("简历解析失败: " + e.getMessage());
-            return ResponseEntity.badRequest().body(null);
-        }
+    public String test() {
+//        try {
+//            Applicant applicant = resumeService.parseResumeTest("D:\\JavaProject\\ResumeSystem\\Resume\\1.docx");
+//            return ResponseEntity.ok(applicant);
+//        } catch (Exception e) {
+//            // 返回错误信息
+//            System.err.println("简历解析失败: " + e.getMessage());
+//            return ResponseEntity.badRequest().body(null);
+//        }
+//        emailMoniterSercive.moniterEmail();
+
+        return "test";
     }
 
     // 将字节数组转换为十六进制字符串

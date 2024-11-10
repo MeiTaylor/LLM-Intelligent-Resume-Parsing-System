@@ -64,10 +64,10 @@
                         <el-col :span="24">
                             <ElTable :data="resumeList" :border="false" style="width: 100%;" max-height="300px"
                                 :show-header="true">
-                                <el-table-column prop="name" label="姓名" />
-                                <el-table-column prop="age" label="年龄" />
+                                <el-table-column prop="applicantName" label="姓名" />
                                 <el-table-column prop="highestEducation" label="最高学历" />
                                 <el-table-column prop="jobIntention" label="求职意向" />
+                                <el-table-column prop="uploadDate" label="上传时间" />
                             </ElTable>
 
                         </el-col>
@@ -127,14 +127,14 @@
         " style="stroke-width: 4px; fill: rgba(0, 0, 0, 0)"/>
     `;
 
-    const getAllResumeList = async () => {
-        try {
-            const response = await getAllResumeParser({ id: userStore.userId });
-            resumeList.value = response.simpleResumes;
-        } catch (error) {
-            console.error(error);
-        }
-    };
+    // const getAllResumeList = async () => {
+    //     try {
+    //         const response = await getAllResumeParser({ id: userStore.userId });
+    //         resumeList.value = response.simpleResumes;
+    //     } catch (error) {
+    //         console.error(error);
+    //     }
+    // };
 
     const search = () => {
         let filteredList = [...resumeDetailsStore.ResumeList];
@@ -166,12 +166,16 @@
 
     onMounted(async () => {
         console.log(userStore.roles);
-        await getAllResumeList();
+        // await getAllResumeList();
 
         try {
-            const res = await axios.post('http://localhost:5177/api/Home/statistics', { id: userStore.userId });
+            const res = await axios.post('http://localhost:8080/api/home/statistics', { userId: userStore.userId });
             resumeNum.value = res.data.totalResumes;
             totalJobs.value = res.data.totalJobs;
+            resumeList.value = res.data.resumeHistory;
+            for (let i = 0; i < resumeList.value.length; i++) {
+                resumeList.value[i].uploadDate = resumeList.value[i].uploadDate.substr(0, 10);
+            }
             console.log(resumeNum.value);
         } catch (error) {
             console.error(error);

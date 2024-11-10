@@ -38,7 +38,11 @@
                 var option;
 
 
-                axios.post('http://localhost:5177/api/Resume/graph/PersonalCharacteristics', { id: this.userId })
+                axios.post('http://localhost:8080/api/applicant/graph/PersonalCharacteristics', this.userId, {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
                     .then(response => {
                         console.log(response.data);
                         var data = response.data.characteristics;

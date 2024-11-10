@@ -42,7 +42,7 @@ public class JobpositionController {
     }
 
     @PostMapping("/add-bulk")
-    public ResponseEntity<List<JobPosition>> addBulkJobPositions() {
+    public ResponseEntity<String> addBulkJobPositions() {
         List<JobPositionDTO> jobPositionDTOs = Arrays.asList(
                 new JobPositionDTO("产品/电商运营", "市场部",
                         "要求至少2年的运营经验，电商背景优先。必须具备数据分析和项目管理能力。需要有自我驱动力，逻辑思维清晰，以及强沟通能力。",
@@ -81,7 +81,7 @@ public class JobpositionController {
             addedPositions.add(jobPositionService.addJobPosition(dto));
         }
 
-        return ResponseEntity.ok(addedPositions);
+        return ResponseEntity.ok("批量添加成功");
     }
 
 }

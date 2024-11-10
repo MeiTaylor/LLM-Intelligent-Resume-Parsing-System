@@ -5,6 +5,7 @@ import com.ylw.backend.dto.JobMatchDTO;
 import com.ylw.backend.model.Applicant;
 import com.ylw.backend.service.ResumeServiceInterface;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,6 +23,8 @@ import java.util.List;
 public class ResumeController {
 
     private final ResumeServiceInterface resumeService;
+    @Value("${resume.file.root}")
+    private String staticFileRoot;
 
     @Autowired
     public ResumeController(ResumeServiceInterface resumeService) {
@@ -48,8 +51,8 @@ public class ResumeController {
             }
 
             // 设置文件存储根目录
-            String staticFileRoot = "D:\\大学本科学习资料\\大四上\\大型软件设计\\resume";
-//            String staticFileRoot = "D:\\JavaProject\\ResumeSystem\\Resume";
+            //String staticFileRoot = "D:\\大学本科学习资料\\大四上\\大型软件设计\\resume";
+            //String staticFileRoot = staticFileRoot;
 
             // 创建基于当前日期的文件存储路径
             LocalDate today = LocalDate.now();
@@ -86,7 +89,7 @@ public class ResumeController {
         }
     }
 
-    @PutMapping("/updateApplicant")
+    @PostMapping("/updateApplicant")
     public ResponseEntity<String> updateApplicant(@RequestBody ApplicantDTO updatedApplicant) {
         try {
             Applicant applicant = resumeService.updateApplicant(updatedApplicant);

@@ -105,7 +105,7 @@ public class ResumeService implements ResumeServiceInterface {
      * @return 保存后的 Resume 对象
      */
     @Override
-    public void createAndSaveResume(String resumePath, Applicant applicant, int jobId, int userId) {
+    public Resume createAndSaveResume(String resumePath, Applicant applicant, int jobId, int userId) {
         Resume resume = new Resume();
         resume.setFilePath(resumePath);
             resume.setApplicant(applicant);
@@ -114,7 +114,7 @@ public class ResumeService implements ResumeServiceInterface {
         resume.setCompany(companyRepository.findByUsers_Id(userId).orElse(null));
         // 保存 Resume 到数据库
         applicant.setResume(resume);
-        resumeRepository.save(resume);
+        return resumeRepository.save(resume);
     }
 
 

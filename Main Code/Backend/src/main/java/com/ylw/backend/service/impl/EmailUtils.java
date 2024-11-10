@@ -3,22 +3,25 @@ package com.ylw.backend.service.impl;
 
 // 导入所需的所有依赖
 import jakarta.mail.*;                       // 核心邮件API
-import jakarta.mail.internet.InternetAddress;// 邮件地址处理
-import jakarta.mail.internet.MimeUtility;    // MIME工具，用于处理邮件编码
-import jakarta.mail.search.FlagTerm;         // 邮件搜索功能
+
 import org.slf4j.Logger;                     // 日志接口
 import org.slf4j.LoggerFactory;              // 日志工厂
 import org.springframework.beans.factory.annotation.Autowired;  // Spring自动注入
 import org.springframework.stereotype.Component;                // Spring组件注解
 import com.ylw.backend.service.ResumeServiceInterface;         // 简历服务接口
-import com.ylw.backend.model.Applicant;                        // 应聘者模型
 
 import java.io.*;                           // IO操作
-import java.text.SimpleDateFormat;          // 日期格式化
 import java.util.Properties;                // 属性配置
 import java.util.concurrent.*;              // 并发工具
 import java.util.Map;                       // Map接口
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeUtility;
+import jakarta.mail.search.FlagTerm;
 
+import java.nio.file.*;
+import java.security.MessageDigest;
+import java.time.LocalDate;
+import java.util.*;
 // 标记为Spring组件，使其能被Spring容器管理
 @Component
 public class EmailUtils {
@@ -26,13 +29,12 @@ public class EmailUtils {
     private static final Logger logger = LoggerFactory.getLogger(EmailUtils.class);
 
     // 定义附件保存的根路径
-    private static final String SAVE_PATH = "E:\\study\\Big_ruan\\code\\my_code\\down_resume";
+//    private static final String SAVE_PATH = "E:\\study\\Big_ruan\\code\\my_code\\down_resume";
+    private static final String SAVE_PATH = "D:\\study\\resume";
 
     // 定义邮件检查的时间间隔（10秒）
     private static final long CHECK_INTERVAL = 10000;
 
-    // 存储邮箱监控器的Map，使用ConcurrentHashMap确保线程安全
-    private final Map<Integer, EmailMonitor> monitors = new ConcurrentHashMap<>();
 
     // 存储监控任务的Future对象的Map，用于任务管理
     private final Map<Integer, Future<?>> monitorFutures = new ConcurrentHashMap<>();
@@ -48,6 +50,200 @@ public class EmailUtils {
     public EmailUtils(ResumeServiceInterface resumeService) {
         this.resumeService = resumeService;
     }
+
+    /**
+     * 获取邮箱中包含附件的新邮件信息
+     * @param emailAddress 邮箱地址
+     * @param password 邮箱授权码
+     * @param savePath 附件保存路径
+     * @return 包含附件的邮件信息列表
+     */
+    public  List<Map<String, Object>> getNewEmails(String emailAddress, String password, String savePath) {
+        // 定义返回结果列表，每个Map代表一封邮件的信息
+        List<Map<String, Object>> emailsList = new ArrayList<>();
+
+        // 根据邮箱类型获取对应的服务器地址
+        String host = emailAddress.endsWith("@qq.com") ? "imap.qq.com" :
+                emailAddress.endsWith("@163.com") ? "imap.163.com" : null;
+
+        if (host == null) {
+            throw new IllegalArgumentException("Unsupported email type");
+        }
+
+        // 设置邮箱连接属性
+        Properties props = new Properties();
+        props.setProperty("mail.store.protocol", "imap");
+        props.setProperty("mail.imap.host", host);
+        props.setProperty("mail.imap.port", "993");
+        props.setProperty("mail.imap.ssl.enable", "true");
+
+        try {
+            // 创建会话并连接邮箱
+            Session session = Session.getInstance(props);
+            Store store = session.getStore("imap");
+            store.connect(host, emailAddress, password);
+
+            // 打开收件箱
+            Folder folder = store.getFolder("INBOX");
+            folder.open(Folder.READ_WRITE);
+
+            // 获取未读邮件
+            Message[] messages = folder.search(new FlagTerm(new Flags(Flags.Flag.SEEN), false));
+            System.out.println("Found " + messages.length + " unread emails");
+
+            // 处理每封未读邮件
+            for (Message message : messages) {
+                // 用于临时存储附件列表
+                List<String> attachments = new ArrayList<>();
+
+                // 处理邮件内容和附件
+                processMessageContent(message, savePath, attachments);
+
+                // 只有当邮件包含附件时才添加到结果列表
+                if (!attachments.isEmpty()) {
+                    Map<String, Object> emailInfo = new HashMap<>();
+                    emailInfo.put("id", message.getMessageNumber());
+                    emailInfo.put("subject", message.getSubject());
+                    emailInfo.put("received_date", message.getReceivedDate());
+                    emailInfo.put("sender", ((InternetAddress)message.getFrom()[0]).getAddress());
+                    emailInfo.put("user_email_id", emailAddress);
+
+                    // 处理邮件正文
+                    String body = extractBody(message);
+                    emailInfo.put("body", body);
+                    emailInfo.put("attachment", attachments);
+
+                    emailsList.add(emailInfo);
+                }
+
+                // 标记邮件为已读
+                message.setFlag(Flags.Flag.SEEN, true);
+            }
+
+            // 关闭资源
+            folder.close(false);
+            store.close();
+
+        } catch (Exception e) {
+            System.err.println("Error processing emails: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return emailsList;
+    }
+
+    /**
+     * 处理邮件内容，提取附件
+     * @param part 邮件部分
+     * @param savePath 保存路径
+     * @param attachments 附件列表
+     */
+    private  void processMessageContent(Part part, String savePath, List<String> attachments) throws Exception {
+        if (part.isMimeType("multipart/*")) {
+            // 处理多部分邮件
+            Multipart multipart = (Multipart) part.getContent();
+            for (int i = 0; i < multipart.getCount(); i++) {
+                processMessageContent(multipart.getBodyPart(i), savePath, attachments);
+            }
+        } else if (part.getDisposition() != null &&
+                (part.getDisposition().equalsIgnoreCase(Part.ATTACHMENT) ||
+                        part.getDisposition().equalsIgnoreCase(Part.INLINE))) {
+            // 处理附件
+            saveAttachment(part, savePath, attachments);
+        }
+    }
+
+    /**
+     * 提取邮件正文
+     * @param message 邮件对象
+     * @return 邮件正文内容
+     */
+    private  String extractBody(Message message) throws Exception {
+        StringBuilder body = new StringBuilder();
+        if (message.isMimeType("text/plain")) {
+            body.append(message.getContent());
+        } else if (message.isMimeType("multipart/*")) {
+            Multipart multipart = (Multipart) message.getContent();
+            for (int i = 0; i < multipart.getCount(); i++) {
+                Part part = multipart.getBodyPart(i);
+                if (part.isMimeType("text/plain") && !Part.ATTACHMENT.equalsIgnoreCase(part.getDisposition())) {
+                    body.append(part.getContent());
+                }
+            }
+        }
+        return body.toString();
+    }
+
+    /**
+     * 保存附件
+     * @param part 邮件部分
+     * @param savePath 保存路径
+     * @param attachments 附件列表
+     */
+    private  void saveAttachment(Part part, String savePath, List<String> attachments) throws Exception {
+        String fileName = MimeUtility.decodeText(part.getFileName());
+        if (fileName != null) {
+            // 获取文件扩展名
+            String fileExtension = getFileExtension(fileName);
+
+            // 创建基于日期的目录结构
+            LocalDate today = LocalDate.now();
+            String fileUrlWithoutFileName = String.format("%d/%d/%d",
+                    today.getYear(), today.getMonthValue(), today.getDayOfMonth());
+            Path directoryPath = Paths.get(savePath, fileUrlWithoutFileName);
+            Files.createDirectories(directoryPath);
+
+            // 计算文件MD5哈希值
+            MessageDigest md5 = MessageDigest.getInstance("MD5");
+            byte[] content = readPartContent(part);
+            byte[] hashBytes = md5.digest(content);
+            String hashedFileName = bytesToHex(hashBytes);
+
+            // 创建新文件名并保存
+            String newFileName = hashedFileName + "." + fileExtension;
+            Path filePath = directoryPath.resolve(newFileName);
+            Files.write(filePath, content);
+
+            // 添加到附件列表
+            attachments.add(filePath.toString());
+            System.out.println("Attachment saved: " + filePath);
+        }
+    }
+
+    /**
+     * 读取Part内容
+     */
+    private  byte[] readPartContent(Part part) throws IOException, MessagingException {
+        try (InputStream is = part.getInputStream();
+             ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            byte[] buffer = new byte[4096];
+            int bytesRead;
+            while ((bytesRead = is.read(buffer)) != -1) {
+                baos.write(buffer, 0, bytesRead);
+            }
+            return baos.toByteArray();
+        }
+    }
+
+    /**
+     * 将字节数组转换为十六进制字符串
+     */
+    private  String bytesToHex(byte[] bytes) {
+        StringBuilder sb = new StringBuilder();
+        for (byte b : bytes) {
+            sb.append(String.format("%02x", b));
+        }
+        return sb.toString();
+    }
+
+    /**
+     * 获取文件扩展名
+     */
+    private  String getFileExtension(String fileName) {
+        int lastIndexOfDot = fileName.lastIndexOf('.');
+        return (lastIndexOfDot == -1) ? "" : fileName.substring(lastIndexOfDot + 1).toLowerCase();
+    }
+
 
     // 验证邮箱账号密码是否正确
     public boolean validateEmailCredentials(String email, String password) {
@@ -88,208 +284,4 @@ public class EmailUtils {
         return null;  // 不支持的邮箱类型返回null
     }
 
-    // 启动邮箱监控
-    public void startMonitor(int emailId, String emailAddress, String password) {
-        // 如果已存在监控，先停止旧的监控
-        stopMonitor(emailId);
-
-        // 获取邮箱服务器地址
-        String host = getEmailHost(emailAddress);
-        if (host == null) {
-            logger.error("不支持的邮箱类型：" + emailAddress);
-            return;
-        }
-
-        // 创建新的监控器
-        EmailMonitor monitor = new EmailMonitor(emailAddress, password, host, emailId);
-        monitors.put(emailId, monitor);
-        // 提交监控任务到线程池并保存Future对象
-        Future<?> future = executorService.submit(monitor);
-        monitorFutures.put(emailId, future);
-        logger.info("开始监控邮箱: " + emailAddress);
-    }
-
-    // 停止指定邮箱的监控
-    public void stopMonitor(int emailId) {
-        // 移除并停止监控器
-        EmailMonitor monitor = monitors.remove(emailId);
-        if (monitor != null) {
-            monitor.stop();
-        }
-
-        // 取消监控任务
-        Future<?> future = monitorFutures.remove(emailId);
-        if (future != null) {
-            future.cancel(true);
-        }
-        logger.info("停止监控邮箱ID: " + emailId);
-    }
-
-    // 停止所有邮箱监控
-    public void stopAllMonitors() {
-        // 遍历停止所有监控器
-        for (Integer emailId : monitors.keySet()) {
-            stopMonitor(emailId);
-        }
-        // 关闭线程池
-        executorService.shutdown();
-        logger.info("停止所有邮箱监控");
-    }
-
-    // 检查指定邮箱是否正在被监控
-    public boolean isMonitoring(int emailId) {
-        return monitors.containsKey(emailId);
-    }
-
-    // 内部类：邮箱监控器
-    private class EmailMonitor implements Runnable {
-        private final String emailAddress;  // 邮箱地址
-        private final String password;      // 邮箱密码
-        private final String host;          // 服务器地址
-        private volatile boolean running = true;  // 运行状态标志
-        private final int emailId;          // 邮箱ID
-
-        // 构造函数：初始化监控器
-        public EmailMonitor(String emailAddress, String password, String host, int emailId) {
-            this.emailAddress = emailAddress;
-            this.password = password;
-            this.host = host;
-            this.emailId = emailId;
-        }
-
-        // 停止监控器运行
-        public void stop() {
-            running = false;
-        }
-
-        // 监控器运行的主方法
-        @Override
-        public void run() {
-            while (running) {
-                try {
-                    checkNewEmails();  // 检查新邮件
-                    Thread.sleep(CHECK_INTERVAL);  // 等待指定时间
-                } catch (Exception e) {
-                    logger.error("检查邮件时发生错误: " + e.getMessage());
-                    try {
-                        Thread.sleep(CHECK_INTERVAL);  // 发生错误后等待
-                    } catch (InterruptedException ie) {
-                        break;  // 如果在等待时被中断，则退出循环
-                    }
-                }
-            }
-        }
-
-        // 检查新邮件的具体实现
-        private void checkNewEmails() {
-            // 设置邮箱连接属性
-            Properties props = new Properties();
-            props.setProperty("mail.store.protocol", "imap");
-            props.setProperty("mail.imap.host", host);
-            props.setProperty("mail.imap.port", "993");
-            props.setProperty("mail.imap.ssl.enable", "true");
-
-            try {
-                // 创建邮件会话并连接服务器
-                Session session = Session.getInstance(props);
-                Store store = session.getStore("imap");
-                store.connect(host, emailAddress, password);
-
-                // 打开收件箱
-                Folder folder = store.getFolder("INBOX");
-                folder.open(Folder.READ_WRITE);
-
-                // 搜索未读邮件
-                Message[] messages = folder.search(new FlagTerm(new Flags(Flags.Flag.SEEN), false));
-                logger.info("发现 {} 封未读邮件", messages.length);
-
-                // 处理每封未读邮件
-                for (Message message : messages) {
-                    processEmail(message);
-                    message.setFlag(Flags.Flag.SEEN, true);  // 标记为已读
-                }
-
-                // 关闭资源
-                folder.close(false);
-                store.close();
-            } catch (Exception e) {
-                logger.error("处理邮件时发生错误: ", e);
-            }
-        }
-
-        // 处理单封邮件
-        private void processEmail(Message message) throws Exception {
-            // 获取邮件主题和发件人信息
-            String subject = message.getSubject();
-            String from = ((InternetAddress) message.getFrom()[0]).getAddress();
-            logger.info("处理新邮件 - 发件人: {} 主题: {}", from, subject);
-
-            // 处理邮件内容
-            handleContent(message);
-        }
-
-        // 处理邮件内容
-        private void handleContent(Part part) throws Exception {
-            if (part.isMimeType("multipart/*")) {
-                // 如果是多部分邮件，递归处理每个部分
-                Multipart multipart = (Multipart) part.getContent();
-                for (int i = 0; i < multipart.getCount(); i++) {
-                    handleContent(multipart.getBodyPart(i));
-                }
-            } else if (part.getDisposition() != null &&
-                    (part.getDisposition().equals(Part.ATTACHMENT) ||
-                            part.getDisposition().equals(Part.INLINE))) {
-                // 如果是附件，保存附件
-                saveAttachment(part);
-            }
-        }
-
-        // 保存附件并处理简历
-        private void saveAttachment(Part part) throws Exception {
-            // 解码附件文件名
-            String fileName = MimeUtility.decodeText(part.getFileName());
-            if (fileName != null) {
-                // 创建保存目录
-                File dir = new File(SAVE_PATH);
-                if (!dir.exists()) {
-                    dir.mkdirs();
-                }
-
-                // 创建带时间戳的子目录
-                String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new java.util.Date());
-                File subDir = new File(dir, timestamp);
-                if (!subDir.exists()) {
-                    subDir.mkdirs();
-                }
-
-                // 构建完整的文件保存路径
-                String fullPath = subDir.getPath() + File.separator + fileName;
-
-                // 保存附件文件
-                try (InputStream is = part.getInputStream();
-                     FileOutputStream fos = new FileOutputStream(fullPath)) {
-                    byte[] buffer = new byte[4096];
-                    int bytesRead;
-                    while ((bytesRead = is.read(buffer)) != -1) {
-                        fos.write(buffer, 0, bytesRead);
-                    }
-                    logger.info("附件已保存: {}", fullPath);
-
-                    // 调用简历解析服务
-                    try {
-                        // 解析简历文件
-                        Applicant applicant = resumeService.parseResume(fullPath);
-                        // 保存简历到数据库（使用临时的jobId和userId）
-                        resumeService.createAndSaveResume(fullPath, applicant, 1, 1);
-                        logger.info("简历解析和保存成功");
-                    } catch (Exception e) {
-                        logger.error("简历解析或保存失败: " + e.getMessage());
-                    }
-                } catch (IOException e) {
-                    logger.error("保存附件失败: " + e.getMessage());
-                    throw e;
-                }
-            }
-        }
-    }
 }

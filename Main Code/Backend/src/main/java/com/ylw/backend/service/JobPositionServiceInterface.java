@@ -15,4 +15,8 @@ public interface JobPositionServiceInterface {
     List<JobResumeCount> getJobResumeCounts(int companyId);
 
     List<JobNameIdDTO> getAllJobNamesAndIds(int userId);
+
+    List<AllResumeWithJobInfo> getAllResumeWithJobInfo(int userId);
+
+    List<ResumeBasicInfo> getAllResumeBasicInfo(int userId);
 }

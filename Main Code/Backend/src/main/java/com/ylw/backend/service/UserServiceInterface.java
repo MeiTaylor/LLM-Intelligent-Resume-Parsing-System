@@ -7,4 +7,8 @@ import com.ylw.backend.dto.RegisterSentModel;
 public interface UserServiceInterface {
     LoginModelClass isLogin(String account, String password);
     RegisterModelClass createNewAccount(RegisterSentModel register);
+
+    void promoteToAdmin(int userId);
+
+    void deleteUser(int userId);
 }

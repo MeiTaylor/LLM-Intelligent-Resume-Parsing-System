@@ -38,5 +38,6 @@ public interface ResumeRepository extends JpaRepository<Resume, Integer> {
 //            "WHERE jp.company.id = :companyId")
 //    List<BriefHomeResumeInfo> findBriefHomeResumeInfoByCompanyId(@Param("companyId") int companyId);
 
+    List<Resume> findByJobPosition_Id(int jobPositionId);
 
 }

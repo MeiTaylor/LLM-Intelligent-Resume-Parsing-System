@@ -73,4 +73,29 @@ public class UserService implements UserServiceInterface {
         }
         return model;
     }
+
+    @Override
+    public void promoteToAdmin(int userId) {
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            if (!"admin".equals(user.getRole())) {
+                user.setRole("admin");
+                userRepository.save(user);
+            } else {
+                throw new RuntimeException("User is already an admin.");
+            }
+        } else {
+            throw new RuntimeException("User not found with ID: " + userId);
+        }
+    }
+
+    @Override
+    public void deleteUser(int userId) {
+        if (userRepository.existsById(userId)) {
+            userRepository.deleteById(userId);
+        } else {
+            throw new RuntimeException("User not found with ID: " + userId);
+        }
+    }
 }

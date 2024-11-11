@@ -84,4 +84,18 @@ public class JobpositionController {
         return ResponseEntity.ok("批量添加成功");
     }
 
+    // 人岗匹配
+    @GetMapping("/allResumeWithJobInfo")
+    public ResponseEntity<List<AllResumeWithJobInfo>> getAllResumeWithJobInfo(@RequestParam int userId) {
+        List<AllResumeWithJobInfo> allResumeWithJobInfo = jobPositionService.getAllResumeWithJobInfo(userId);
+        return ResponseEntity.ok(allResumeWithJobInfo);
+    }
+
+    //所有简历基本信息
+    @GetMapping("/allResumeBasciInfo")
+    public ResponseEntity<List<ResumeBasicInfo>> getAllResumeBasicInfo(@RequestParam int userId) {
+        List<ResumeBasicInfo> resumeBasicInfos = jobPositionService.getAllResumeBasicInfo(userId);
+        return ResponseEntity.ok(resumeBasicInfos);
+    }
+
 }

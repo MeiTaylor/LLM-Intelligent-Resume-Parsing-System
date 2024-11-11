@@ -1,9 +1,6 @@
 package com.ylw.backend.service;
 
-import com.ylw.backend.dto.AgeGroups;
-import com.ylw.backend.dto.EducationInfoForGraphClass;
-import com.ylw.backend.dto.InfoForHomeModelClass;
-import com.ylw.backend.dto.WorkStability;
+import com.ylw.backend.dto.*;
 
 public interface CompanyServiceInterface {
     InfoForHomeModelClass getInfoForHome(int userId);
@@ -13,4 +10,6 @@ public interface CompanyServiceInterface {
     AgeGroups ageInfoForGraphClass(int userId);
 
     WorkStability workStabilityInfoForGraphClass(int userId);
+
+    JobMatchScores getJobMatchScoresForGraph(int userId);
 }

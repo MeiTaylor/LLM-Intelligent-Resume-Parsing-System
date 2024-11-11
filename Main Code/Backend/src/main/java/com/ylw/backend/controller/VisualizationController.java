@@ -1,9 +1,6 @@
 package com.ylw.backend.controller;
 
-import com.ylw.backend.dto.AgeGroups;
-import com.ylw.backend.dto.EducationInfoForGraphClass;
-import com.ylw.backend.dto.GraphForJobResumeCountModelClass;
-import com.ylw.backend.dto.WorkStability;
+import com.ylw.backend.dto.*;
 import com.ylw.backend.service.CompanyServiceInterface;
 import com.ylw.backend.service.JobPositionServiceInterface;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,9 +38,10 @@ public class VisualizationController {
         return companyService.workStabilityInfoForGraphClass(userId);
     }
 
-
-
-
+    @GetMapping("/jobMatchScore")
+    public JobMatchScores getJobMatchScoresForGraph(int userId) {
+        return companyService.getJobMatchScoresForGraph(userId);
+    }
 
 
 

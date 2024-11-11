@@ -69,9 +69,14 @@ public class CompanyService implements CompanyServiceInterface {
             if (applicant == null) {
                 continue;
             }
+            // 统计最高学历
+            String highestEducation = applicant.getHighestEducation();
+            if (highestEducation == null) {
+                highestEducation = "未知"; // 提供默认值
+            }
 
             // 统计最高学历
-            switch (applicant.getHighestEducation()) {
+            switch (highestEducation) {
                 case "无":
                 case "小学":
                 case "初中":
@@ -91,10 +96,17 @@ public class CompanyService implements CompanyServiceInterface {
                 case "博士":
                     highestEducationCounts.setDoctor(highestEducationCounts.getDoctor() + 1);
                     break;
+                default:
+                    highestEducationCounts.setHighSchoolOrLess(highestEducationCounts.getHighSchoolOrLess() + 1);
+                    break;
             }
 
             // 统计毕业院校等级
-            switch (applicant.getGraduatedFromLevel()) {
+            String graduatedFromLevel = applicant.getGraduatedFromLevel();
+            if (graduatedFromLevel == null) {
+                graduatedFromLevel = "未知"; // 提供默认值
+            }
+            switch (graduatedFromLevel) {
                 case "985":
                     graduationSchoolsLevelCounts.set_985(graduationSchoolsLevelCounts.get_985() + 1);
                     break;
@@ -105,6 +117,7 @@ public class CompanyService implements CompanyServiceInterface {
                     graduationSchoolsLevelCounts.setOrdinaryFirstClass(graduationSchoolsLevelCounts.getOrdinaryFirstClass() + 1);
                     break;
                 case "一本以下":
+                default:
                     graduationSchoolsLevelCounts.setSecondClassOrBelow(graduationSchoolsLevelCounts.getSecondClassOrBelow() + 1);
                     break;
             }
@@ -191,6 +204,45 @@ public class CompanyService implements CompanyServiceInterface {
         }
 
         return workStability;
+    }
+
+    @Override
+    public JobMatchScores getJobMatchScoresForGraph(int userId) {
+        Company company = companyRepository.findByUsers_Id(userId).orElse(null);
+        JobMatchScores jobMatchScores = new JobMatchScores();
+        if (company == null) {
+            return jobMatchScores;
+        }
+        int companyId = company.getId();
+        List<Resume> resumes = resumeRepository.findByCompanyId(companyId);
+
+        // 遍历所有简历
+        for (Resume resume : resumes) {
+            ApplicantProfile applicantProfile = resume.getApplicant().getApplicantProfile();
+            if (applicantProfile == null || applicantProfile.getJobMatches() == null || applicantProfile.getJobMatches().isEmpty()) {
+                continue;
+            }
+
+            // 找到每个 JobMatches 集合中的最大 Score 并添加到列表中
+            int maxScore = applicantProfile.getJobMatches().stream()
+                    .mapToInt(JobMatch::getScore)
+                    .max()
+                    .orElse(0);
+
+            if (maxScore < 60) {
+                jobMatchScores.setBelow60(jobMatchScores.getBelow60() + 1);
+            } else if (maxScore < 70) {
+                jobMatchScores.setRange60_70(jobMatchScores.getRange60_70() + 1);
+            } else if (maxScore < 80) {
+                jobMatchScores.setRange70_80(jobMatchScores.getRange70_80() + 1);
+            } else if (maxScore < 90) {
+                jobMatchScores.setRange80_90(jobMatchScores.getRange80_90() + 1);
+            } else {
+                jobMatchScores.setRange90_100(jobMatchScores.getRange90_100() + 1);
+            }
+        }
+
+        return jobMatchScores;
     }
 
 

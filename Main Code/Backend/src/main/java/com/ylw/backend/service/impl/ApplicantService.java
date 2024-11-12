@@ -66,7 +66,7 @@ public class ApplicantService implements ApplicantServiceInterface {
             applicant.setHighestEducation(educationInfo.get("最高学历"));
             applicant.setMajor(educationInfo.get("专业"));
             applicant.setGraduatedFrom(educationInfo.get("毕业院校"));
-            applicant.setGraduatedFromLevel(educationInfo.get("院校级别"));
+            applicant.setGraduatedFromLevel(educationInfo.get("院校等级"));
             applicant.setSelfEvaluation((String) jsonMap.get("自我评价"));
 
 

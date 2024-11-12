@@ -123,7 +123,8 @@ public class ConversationServiceImpl implements ConversationService {
     private String getResumeFilePath(int resumeId) {
         logger.debug("Fetching file path for resume ID: {}", resumeId);
 
-        Resume resume = resumeRepository.findById(resumeId);
+        //Resume resume = resumeRepository.findById(resumeId);
+        Resume resume = resumeRepository.findById(resumeId).orElseThrow(() -> new RuntimeException("找不到ID为 " + resumeId + " 的简历"));
         if (resume == null) {
             throw new RuntimeException("找不到ID为 " + resumeId + " 的简历");
         }
@@ -136,12 +137,6 @@ public class ConversationServiceImpl implements ConversationService {
         logger.debug("Found file path: {} for resume ID: {}", filePath, resumeId);
         return filePath;
     }
-
-
-
-
-
-
 
     @Override
     @Transactional

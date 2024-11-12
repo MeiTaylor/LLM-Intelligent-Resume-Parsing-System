@@ -8,6 +8,8 @@ public interface UserServiceInterface {
     LoginModelClass isLogin(String account, String password);
     RegisterModelClass createNewAccount(RegisterSentModel register);
 
+    boolean isUserAdmin(int userId);
+
     void promoteToAdmin(int userId);
 
     void deleteUser(int userId);

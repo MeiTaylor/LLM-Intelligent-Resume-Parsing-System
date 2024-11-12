@@ -48,9 +48,14 @@ public class UserController {
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<String> deleteUser(@RequestParam int userId) {
+    public ResponseEntity<String> deleteUser(@RequestParam int currentUserId, @RequestParam int userIdToDelete) {
         try {
-            userService.deleteUser(userId);
+            // 检查当前用户是否有权限
+            if (!userService.isUserAdmin(currentUserId)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Permission denied: You do not have the rights to delete a user.");
+            }
+
+            userService.deleteUser(userIdToDelete);
             return ResponseEntity.ok("User deleted successfully.");
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found: " + e.getMessage());

@@ -75,6 +75,15 @@ public class UserService implements UserServiceInterface {
     }
 
     @Override
+    public boolean isUserAdmin(int userId) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            throw new RuntimeException("User not found with ID: " + userId);
+        }
+        return "admin".equalsIgnoreCase(user.getRole());
+    }
+
+    @Override
     public void promoteToAdmin(int userId) {
         Optional<User> userOptional = userRepository.findById(userId);
         if (userOptional.isPresent()) {

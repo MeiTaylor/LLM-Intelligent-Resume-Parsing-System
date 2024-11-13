@@ -3,18 +3,17 @@ package com.ylw.backend.controller;
 import com.ylw.backend.dto.*;
 import com.ylw.backend.service.impl.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/email")
 public class EmailController {
     private final EmailService emailService;
-
     @Autowired
     public EmailController(EmailService emailService) {
         this.emailService = emailService;
@@ -49,4 +48,11 @@ public class EmailController {
         System.out.println(webSentUserId);
         return emailService.fondAllEmailReceiveResumeInfo(webSentUserId.getUserId());
     }
+
+    @GetMapping("/email-count")
+    public ResponseEntity<Map<LocalDate, Integer>> getEmailCountForLastWeek(@RequestParam int userId) {
+        Map<LocalDate, Integer> emailCounts = emailService.getEmailCountForLastWeek(userId);
+        return ResponseEntity.ok(emailCounts);
+    }
+
 }

@@ -212,7 +212,7 @@ public class JobPositionService implements JobPositionServiceInterface {
     }
 
     @Override
-    public List<ResumeBasicInfo> getAllResumeBasicInfo(int userId) {
+    public List<ResumeWithJobInfo> getAllResumeBasicInfo(int userId) {
         int companyId = userRepository.findCompanyIdById(userId).orElse(-1);
         List<JobPosition> jobPositions = jobPositionRepository.findByCompanyId(companyId);
 
@@ -220,7 +220,7 @@ public class JobPositionService implements JobPositionServiceInterface {
             return Collections.emptyList();
         }
 
-        List<ResumeBasicInfo> resumeBasicInfos = new ArrayList<>();
+        List<ResumeWithJobInfo> resumeWithJobInfos = new ArrayList<>();
 
         for (JobPosition jobPosition : jobPositions) {
             List<Resume> resumes = jobPosition.getResumes();
@@ -230,14 +230,15 @@ public class JobPositionService implements JobPositionServiceInterface {
                     continue;
                 }
 
-                ResumeBasicInfo resumeBasicInfo = new ResumeBasicInfo();
-                resumeBasicInfo.setId(resume.getId());
-                resumeBasicInfo.setName(applicant.getName());
-                resumeBasicInfo.setGender(applicant.getGender());
-                resumeBasicInfo.setAge(applicant.getAge());
-                resumeBasicInfo.setHighestEducation(applicant.getHighestEducation());
-                resumeBasicInfo.setPhoneNumber(applicant.getPhoneNumber());
-                resumeBasicInfo.setJobIntention(applicant.getJobIntention());
+                ResumeWithJobInfo resumeWithJobInfo = new ResumeWithJobInfo();
+                resumeWithJobInfo.setResumeId(String.valueOf(resume.getId()));
+                resumeWithJobInfo.setName(applicant.getName());
+                resumeWithJobInfo.setGender(applicant.getGender());
+                resumeWithJobInfo.setAge(applicant.getAge());
+                resumeWithJobInfo.setWorkExperience(applicant.getTotalWorkYears());
+                resumeWithJobInfo.setEducation(applicant.getHighestEducation());
+                resumeWithJobInfo.setMajor(applicant.getMajor());
+                resumeWithJobInfo.setJobIntention(applicant.getJobIntention());
                 // 从 ApplicantProfile 的 JobMatches 中选取最高分数的 JobMatch
                 ApplicantProfile applicantProfile = applicant.getApplicantProfile();
                 if (applicantProfile != null && applicantProfile.getJobMatches() != null && !applicantProfile.getJobMatches().isEmpty()) {
@@ -245,15 +246,24 @@ public class JobPositionService implements JobPositionServiceInterface {
                             .max(Comparator.comparingInt(JobMatch::getScore))
                             .orElse(null);
                     if (bestJobMatch != null) {
-                        resumeBasicInfo.setMaxMatchingScore(bestJobMatch.getScore());
+                        resumeWithJobInfo.setScore(bestJobMatch.getScore());
+                        resumeWithJobInfo.setMatchJob(bestJobMatch.getJobTitle());
                     }
                 } else {
-                    resumeBasicInfo.setMaxMatchingScore(0);
+                    resumeWithJobInfo.setScore(0);
+                    resumeWithJobInfo.setMatchJob("N/A");
                 }
-                resumeBasicInfos.add(resumeBasicInfo);
+                resumeWithJobInfo.setSchool(applicant.getGraduatedFrom());
+
+                List<String> characteristics = applicant.getApplicantProfile() != null && applicant.getApplicantProfile().getCharacteristics() != null
+                        ? applicant.getApplicantProfile().getCharacteristics().stream().map(Characteristic::getName).collect(Collectors.toList())
+                        : new ArrayList<>();
+                resumeWithJobInfo.setCharacteristics(characteristics);
+
+                resumeWithJobInfos.add(resumeWithJobInfo);
             }
         }
 
-        return resumeBasicInfos;
+        return resumeWithJobInfos;
     }
 }

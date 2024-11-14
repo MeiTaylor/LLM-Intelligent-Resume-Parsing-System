@@ -20,7 +20,7 @@
                 var option;
 
 
-                axios.post('http://localhost:5177/api/Resume/graph/workStability', { id: this.userId })
+                axios.get('http://localhost:8080/api/visualization/workStability', { params: { userId: this.userId } })
                     .then(response => {
                         console.log(response);
                         var data = response.data;
@@ -50,11 +50,11 @@
                         //用来动态连接前端页面和后端的数组
                         for (var i = 0; i < 5; i++) {
 
-                            if (needData[i].name === '非常不稳定') needData[i].value = data.workStability.low
-                            if (needData[i].name === '较不稳定') needData[i].value = data.workStability.mediumLow
-                            if (needData[i].name === '正常稳定') needData[i].value = data.workStability.medium
-                            if (needData[i].name === '比较稳定') needData[i].value = data.workStability.mediumHigh
-                            if (needData[i].name === '很稳定') needData[i].value = data.workStability.high
+                            if (needData[i].name === '非常不稳定') needData[i].value = data.low
+                            if (needData[i].name === '较不稳定') needData[i].value = data.mediumLow
+                            if (needData[i].name === '正常稳定') needData[i].value = data.medium
+                            if (needData[i].name === '比较稳定') needData[i].value = data.mediumHigh
+                            if (needData[i].name === '很稳定') needData[i].value = data.high
                             sum = sum + needData[i].value
                         }
 

@@ -18,10 +18,10 @@
                 const chartDom = this.$refs.chart;
                 const myChart = echarts.init(chartDom);
                 var option;
-                axios.post('http://localhost:5177/api/Resume/graph/ageInfo', { id: this.userId })
+                axios.get('http://localhost:8080/api/visualization/age', { params: { userId: this.userId } })
                     .then(response => {
                         console.log(response);
-                        var data = response.data.ageGroups;
+                        var data = response.data;
 
                         var ageData = [];
                         //将ageData与那个连接起来

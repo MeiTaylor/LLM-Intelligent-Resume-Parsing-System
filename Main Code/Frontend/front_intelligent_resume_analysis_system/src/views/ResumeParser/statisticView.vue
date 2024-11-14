@@ -90,7 +90,7 @@
 
     onMounted(async () => {
         try {
-            const response = await axios.post('http://localhost:5177/api/Home/statistics', { id: userStore.userId });
+            const response = await axios.post('http://localhost:8080/api/home/statistics', { userId: userStore.userId });
             resumeNum.value = response.data.totalResumes;
             totalJobs.value = response.data.totalJobs;
             console.log(resumeNum.value);

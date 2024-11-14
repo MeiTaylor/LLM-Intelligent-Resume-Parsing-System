@@ -15,7 +15,7 @@
         props: ['userId'],
         methods: {
             renderChart() {
-                axios.post('http://localhost:5177/api/Resume/graph/education', { id: this.userId })//此时的userid需要外界传入
+                axios.get('http://localhost:8080/api/visualization/education', { params: { userId: this.userId } })//此时的userid需要外界传入
                     .then(response => {
 
                         var data = response.data;

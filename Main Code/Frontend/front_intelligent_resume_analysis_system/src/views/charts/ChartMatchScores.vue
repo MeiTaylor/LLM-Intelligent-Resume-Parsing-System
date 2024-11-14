@@ -18,14 +18,10 @@
                 const chartDom = this.$refs.chart;
                 const myChart = echarts.init(chartDom);
                 var option;
-                axios.post('http://localhost:8080/api/applicant/graph/PersonalJobMatchScore', this.userId, {
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                })
+                axios.get('http://localhost:8080/api/visualization/jobMatchScore', { params: { userId: this.userId } })
                     .then(response => {
                         console.log(response.data);
-                        var data = response.data.jobMatchScores;
+                        var data = response.data;
                         //连接前端的数组
                         var needData = [
                             { value: 6, name: '60分以下' },

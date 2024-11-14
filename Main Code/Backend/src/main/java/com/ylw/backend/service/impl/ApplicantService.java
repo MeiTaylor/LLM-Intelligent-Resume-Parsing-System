@@ -20,6 +20,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.nio.file.Path;
+import java.io.FileNotFoundException;
+
 
 @Service
 public class ApplicantService implements ApplicantServiceInterface {
@@ -39,8 +42,30 @@ public class ApplicantService implements ApplicantServiceInterface {
     @Override
     public Applicant createApplicantFromJsonFile(String jsonFilePath) {
         try {
+            // 检查文件名是否合法
+            Path path = Paths.get(jsonFilePath);
+            String fileName = path.getFileName().toString();
+
+            // 如果文件名包含其他扩展名（如.pdf.json）
+            if (fileName.contains(".")) {
+                // 获取最后一个点之前的所有内容
+                String baseName = fileName.substring(0, fileName.indexOf("."));
+                // 构建新的文件名，只保留基础名称和.json扩展名
+                String newFileName = baseName + ".json";
+                // 获取父目录路径
+                String parentPath = path.getParent().toString();
+                // 构建新的完整路径
+                String newPath = parentPath + File.separator + newFileName;
+                path = Paths.get(newPath);
+            }
+
+            // 检查文件是否存在
+            if (!Files.exists(path)) {
+                throw new FileNotFoundException("JSON file not found: " + path);
+            }
+
             // 读取JSON文件内容
-            String jsonContent = new String(Files.readAllBytes(Paths.get(jsonFilePath)));
+            String jsonContent = new String(Files.readAllBytes(path));
 
             ObjectMapper mapper = new ObjectMapper();
             Map<String, Object> jsonMap = mapper.readValue(jsonContent, Map.class);
@@ -184,8 +209,23 @@ public class ApplicantService implements ApplicantServiceInterface {
     @Override
     public void parseCharacteristicsJson(ApplicantProfile applicantProfile, String jsonFilePath) {
         try {
+            Path path = Paths.get(jsonFilePath);
+            String fileName = path.getFileName().toString();
+
+            if (fileName.contains(".")) {
+                String baseName = fileName.substring(0, fileName.indexOf("."));
+                String newFileName = baseName + ".json";
+                String parentPath = path.getParent().toString();
+                String newPath = parentPath + File.separator + newFileName;
+                path = Paths.get(newPath);
+            }
+
+            if (!Files.exists(path)) {
+                throw new FileNotFoundException("JSON file not found: " + path);
+            }
+
             ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode rootNode = objectMapper.readTree(new File(jsonFilePath));
+            JsonNode rootNode = objectMapper.readTree(path.toFile());
 
             // 遍历每个大类（例如 "个人特性", "技能和经验", "成就和亮点评价"）
             Iterator<String> mainCategories = rootNode.fieldNames();
@@ -243,10 +283,26 @@ public class ApplicantService implements ApplicantServiceInterface {
         }
     }
 
+    @Override
     public void parseJobMatchingJson(ApplicantProfile applicantProfile, String jsonFilePath) {
         try {
+            Path path = Paths.get(jsonFilePath);
+            String fileName = path.getFileName().toString();
+
+            if (fileName.contains(".")) {
+                String baseName = fileName.substring(0, fileName.indexOf("."));
+                String newFileName = baseName + ".json";
+                String parentPath = path.getParent().toString();
+                String newPath = parentPath + File.separator + newFileName;
+                path = Paths.get(newPath);
+            }
+
+            if (!Files.exists(path)) {
+                throw new FileNotFoundException("JSON file not found: " + path);
+            }
+
             ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode rootNode = objectMapper.readTree(new File(jsonFilePath));
+            JsonNode rootNode = objectMapper.readTree(path.toFile());
 
             // 从 JSON 文件中提取数据并创建 JobMatch 对象
             List<JobMatch> jobMatches = new ArrayList<>();

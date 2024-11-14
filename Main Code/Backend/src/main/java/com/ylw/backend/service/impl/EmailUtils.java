@@ -7,6 +7,7 @@ import jakarta.mail.*;                       // 核心邮件API
 import org.slf4j.Logger;                     // 日志接口
 import org.slf4j.LoggerFactory;              // 日志工厂
 import org.springframework.beans.factory.annotation.Autowired;  // Spring自动注入
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;                // Spring组件注解
 import com.ylw.backend.service.ResumeServiceInterface;         // 简历服务接口
 
@@ -30,7 +31,10 @@ public class EmailUtils {
 
     // 定义附件保存的根路径
 //    private static final String SAVE_PATH = "E:\\study\\Big_ruan\\code\\my_code\\down_resume";
-    private static final String SAVE_PATH = "D:\\study\\resume";
+    @Value("${resume.file.root}")
+    private static String SAVE_PATH;
+//    private static final String SAVE_PATH = "D:\\study\\resume";
+
 
     // 定义邮件检查的时间间隔（10秒）
     private static final long CHECK_INTERVAL = 10000;

@@ -313,6 +313,15 @@
             allJobList.value = res.data
         })
         //TODO: 这里的接口地址需要改成后端的接口地址
+        axios.get('http://localhost:8080/api/jobposition/allResumeBasciInfo', {
+            params: {
+                userId: userStore.userId
+            }
+        }).then((res) => {
+            console.log(`output->res`, res)
+            resumeInfoList.value = res.data
+            resumeInfoSearchList.value = res.data
+        })
         // const res = await axios.post('https://mock.presstime.cn/mock/67275d10caf0b4e52f13f169/resume/all/resumes', {
         //     userId: userStore.userId
         // })

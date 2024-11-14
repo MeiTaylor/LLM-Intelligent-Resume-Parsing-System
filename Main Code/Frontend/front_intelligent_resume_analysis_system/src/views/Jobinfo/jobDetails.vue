@@ -37,6 +37,9 @@
                             <h2 style="margin: 0;">岗位：{{clickJobName}}</h2>
                         </div>
                     </template>
+                    <div v-if="resumeInfoList.length==0?true:false">
+                        <h1 class="no-resume">暂无匹配的简历</h1>
+                    </div>
                     <!--TODO: 单个卡片的样式，后面需要改成v-for -->
                     <el-card v-for="resumeInfo in resumeInfoList" class="match-card" shadow="always">
                         <el-row :space="10">
@@ -88,89 +91,26 @@
         label: 'label',
     }
     // TODO: 这是在后端发送完请求后再赋值的，还需加上为空时的异常处理
-    const resumeInfoList = ref([{
-        name: '林一',
-        gender: '男',
-        age: 22,
-        workExperience: 1,
-        education: '本科',
-        major: '计算机科学与技术',
-        score: '90',
-        JobIntention: '算法工程师',
-        matchJob: '算法工程师',
-        school: '武汉大学',
-        characteristics: ['能力出众', '经验丰富', '工作稳定']
-    }, {
-        name: '李思',
-        gender: '女',
-        age: 22,
-        workExperience: 1,
-        education: '本科',
-        major: '计算机科学与技术',
-        score: '90',
-        JobIntention: '算法工程师',
-        matchJob: '算法工程师',
-        school: '武汉大学',
-        characteristics: ['能力出众', '经验丰富', '工作稳定']
-    }, {
-        name: '龙天一',
-        gender: '男',
-        age: 22,
-        workExperience: 1,
-        education: '本科',
-        major: '计算机科学与技术',
-        score: '90',
-        JobIntention: '算法工程师',
-        matchJob: '算法工程师',
-        school: '武汉大学',
-        characteristics: ['能力出众', '经验丰富', '工作稳定']
-    }, {
-        name: '李思思',
-        gender: '女',
-        age: 22,
-        workExperience: 1,
-        education: '本科',
-        major: '计算机科学与技术',
-        score: '90',
-        JobIntention: '算法工程师',
-        matchJob: '算法工程师',
-        school: '武汉大学',
-        characteristics: ['能力出众', '经验丰富', '工作稳定']
-    }, {
-        name: '林二',
-        gender: '男',
-        age: 22,
-        workExperience: 1,
-        education: '本科',
-        major: '计算机科学与技术',
-        score: '90',
-        JobIntention: '算法工程师',
-        matchJob: '算法工程师',
-        school: '武汉大学',
-        characteristics: ['能力出众', '经验丰富', '工作稳定']
-    }
-
+    const resumeInfoList = ref([
 
     ])
+
+    var allResumeInfo = []
 
 
     const manpicter = ref(new URL('@/assets/images/man.jpg', import.meta.url))
     const womanpicter = ref(new URL('@/assets/images/women.jpg', import.meta.url))
     const clickJobName = ref()
 
-    //函数
+    //函数  点击左侧树形结构的岗位名字
     const handleNodeClick = (newclickJobName) => {
-        console.log('点击左侧名字', newclickJobName)
-        var isFirstLayer = false
-        //筛选点击的岗位
-        data.value.forEach(element => {
-            if (element.name == newclickJobName) {
-                isFirstLayer = true
-            }
-        });
-        if (!isFirstLayer) {
-            clickJobName.value = newclickJobName
-            console.log(`output->是二级标题`)
+        if (newclickJobName) {
+            console.log('点击左侧名字', newclickJobName)
+            allResumeInfo.forEach((element => {
+                if (element.jobName == newclickJobName) {
+                    resumeInfoList.value = element.resumeWithJobInfos
+                }
+            }))
         }
     }
 
@@ -185,6 +125,42 @@
             data.value = res.data
             //使用第一个默认的数据
             clickJobName.value = data.value[0].children[0].jobName
+            allResumeInfo.forEach(element => {
+                console.log(`output->elment--job`, element)
+                if (element.jobName == clickJobName.value) {
+                    console.log(`output->这是我选择出来的`, element.resumeWithJobInfos)
+                    resumeInfoList.value = element.resumeWithJobInfos
+                }
+            });
+        })
+
+        //获取所有含有岗位信息的简历
+        axios.get('http://localhost:8080/api/jobposition/allResumeWithJobInfo', {
+            params: {
+                userId: userStore.userId
+            }
+        }).then((res) => {
+            console.log(`output->res`, res)
+            //确保简历特性最多为3个
+
+            //修改右边的简历信息
+            allResumeInfo = res.data
+            allResumeInfo.forEach(element => {
+                element.resumeWithJobInfos.forEach((element) => {
+                    if (element.characteristics.length > 3) {
+                        element.characteristics = element.characteristics.slice(0, 3)
+                    }
+                })
+            })
+            //使用第一个默认的数据
+            allResumeInfo.forEach(element => {
+                console.log(`output->elment--getresume`, element)
+
+                if (element.jobName == clickJobName.value) {
+                    console.log(`output->这是我选择出来的`, element)
+                    resumeInfoList.value = element.resumeWithJobInfos
+                }
+            });
         })
     })
 
@@ -204,6 +180,32 @@
 </script>
 
 <style scoped>
+    .no-resume {
+        color: #ff6f61;
+        /* 设置文本颜色 */
+        background: linear-gradient(135deg, #fff3f3, #ffe6e6);
+        /* 设置渐变背景颜色 */
+        padding: 15px 20px;
+        /* 设置内边距 */
+        border-radius: 10px;
+        /* 设置圆角 */
+        text-align: center;
+        /* 设置文本居中 */
+        font-size: 1.5em;
+        /* 设置字体大小 */
+        font-weight: bold;
+        /* 设置字体加粗 */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        /* 添加阴影效果 */
+        transition: transform 0.3s ease;
+        /* 添加过渡效果 */
+    }
+
+    .no-resume:hover {
+        transform: scale(1.05);
+        /* 鼠标悬停时放大 */
+    }
+
     .education-info {
 
         margin-left: 8px;

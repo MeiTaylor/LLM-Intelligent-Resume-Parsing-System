@@ -36,7 +36,7 @@ public class  EmailMoniterSercive {
         this.emailMessageRepository = emailMessageRepository;
     }
 
-    @Scheduled(fixedRate = 5000)
+//    @Scheduled(fixedRate = 5000)
     public void moniterEmail(){
         List<EmailMoniterInfo> emails = userEmailRepository.findEmailBySyncEnabled(true);
         for (EmailMoniterInfo email : emails) {

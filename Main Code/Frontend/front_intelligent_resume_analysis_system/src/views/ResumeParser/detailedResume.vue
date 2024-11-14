@@ -38,7 +38,7 @@
                     <div v-if="isChat">
                         <!-- 聊天界面 -->
                         <ElCard style="margin-right:20px ;">
-                            <chat style="height: 640px;"></chat>
+                            <chat style="height: 640px;" :RID="this.RID"></chat>
 
                         </ElCard>
 

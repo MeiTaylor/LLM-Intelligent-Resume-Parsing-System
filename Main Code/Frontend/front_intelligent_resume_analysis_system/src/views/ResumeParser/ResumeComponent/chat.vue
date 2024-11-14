@@ -6,44 +6,53 @@
             </div>
         </div>
         <div class="input-box">
-            <input v-model="newMessage" @keyup.enter="sendMessage" placeholder="Type a message" />
-            <button @click="sendMessage">Send</button>
+            <input v-model="newMessage" @keyup.enter="sendMessage" placeholder="Type a message" :disabled="isSending" />
+
+            <button @click="sendMessage" :disabled="isSending">
+                Send
+            </button>
         </div>
     </div>
 </template>
 
-<script>
-    export default {
-        data() {
-            return {
-                messages: [{
-                    role: 'user',
-                    text: '简要介绍其工作经历'
-                },
-                {
-                    role: 'ai',
-                    text: "李中冰有着丰富的策划工作经验。他在深圳方维网络设计公司担任策划专员期间，主要负责制定短期目标，引导团队成员完成任务，并进行项目进度管理。他善于利用目标激励与情感激励来保持团队文化的积极性。之后，他晋升至深圳素马网络设计公司的策划总监，负责项目的推广和进度管理，利用微博与讲座结合获得了310个客户。"
-                }
-                ],
-                newMessage: ''
-            };
-        },
-        methods: {
-            sendMessage() {
-                if (this.newMessage.trim() !== '') {
-                    // Add user message
-                    this.messages.push({ role: 'user', text: this.newMessage });
+<script setup>
+    import { ref, reactive, defineProps } from 'vue';
+    import axios from 'axios';
+    const messages = reactive([{
+        role: 'ai',
+        text: '我是你的贴心AI助手小历，有什么可以帮助你的吗？'
+    }]);
 
-                    // Simulate AI response
-                    setTimeout(() => {
-                        this.messages.push({ role: 'ai', text: 'This is an AI response' });
-                    }, 1000);
+    const newMessage = ref('')
+    const isSending = ref(false)
+    const sendMessage = () => {
+        console.log(`output->props.RID`, props.RID)
+        if (newMessage.value.trim() !== '') {
+            // Add user message
+            messages.push({ role: 'user', text: newMessage.value });
+            isSending.value = true;
+            // Simulate AI response
+            axios.post('http://localhost:8080/api/conversation/ask', { question: newMessage.value, resumeId: props.RID })
+                .then(response => {
+                    console.log(response);
+                    messages.push({ role: 'ai', text: response.data });
+                })
+                .catch(error => {
+                    console.error(error);
+                })
+                .finally(() => {
+                    isSending.value = false;
+                });
 
-                    this.newMessage = '';
-                }
-            }
+            newMessage.value = '';
+
         }
-    };
+    }
+
+    const props = defineProps({
+        RID: String
+    })
+
 </script>
 
 <style>
@@ -110,6 +119,12 @@
         margin-right: 10px;
     }
 
+    input:disabled {
+        background-color: #f0f0f0;
+        cursor: not-allowed;
+
+    }
+
     button {
         padding: 10px 20px;
         border: none;
@@ -121,5 +136,21 @@
 
     button:hover {
         background-color: #0056b3;
+    }
+
+    button:disabled {
+        background-color: #a0cfff;
+        cursor: not-allowed;
+    }
+
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
     }
 </style>

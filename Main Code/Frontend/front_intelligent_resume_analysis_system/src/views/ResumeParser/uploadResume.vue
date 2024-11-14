@@ -103,11 +103,14 @@
                 </div>
             </el-card>
         </div>
+        <!-- sencondemodify -->
         <el-drawer v-model="sencondemodify" title="简历修正" :direction="direction" style="margin-bottom: 0px;"
             :before-close="handleClose" size="90%">
             <el-row :gutter="5">
-                <el-col :span="12" style="background-color: #5a8255; min-height: 600px;max-height: 700px;">
-
+                <el-col :span="12" style=" min-height: 600px;max-height: 700px;">
+                    <div class="image-container">
+                        <img class="responsive-image" :src="imageSrc" alt="Resume Image" />
+                    </div>
                 </el-col>
 
                 <el-col :span="12">
@@ -220,7 +223,7 @@
 
 <script setup>
     import { UploadFilled } from '@element-plus/icons-vue'
-    import { ref, computed, reactive } from 'vue'
+    import { ref, reactive, computed } from 'vue'
     import axios from 'axios'
     import { onMounted } from 'vue'
     import { useUser } from '../../stores/user';
@@ -250,10 +253,12 @@
 
     const sencondemodify = ref(false)
     const selectJobId = ref()
+    const imageSrc = ref('')
     const modifyResumeInfo = ref()
 
     const allJobList = ref()
 
+    // const isTrue = ref(true)
     //实现搜索功能
     const search = () => {
         var searchList = resumeInfoList.value
@@ -313,21 +318,23 @@
             allJobList.value = res.data
         })
         //TODO: 这里的接口地址需要改成后端的接口地址
-        axios.get('http://localhost:8080/api/jobposition/allResumeBasciInfo', {
+        axios.get('http://localhost:8080/api/jobposition/allResumeBasicInfo', {
             params: {
                 userId: userStore.userId
             }
         }).then((res) => {
             console.log(`output->res`, res)
             resumeInfoList.value = res.data
-            resumeInfoSearchList.value = res.data
+            resumeInfoList.value.forEach(element => {
+
+                if (element.characteristics.length > 5) {
+                    element.characteristics = element.characteristics.slice(0, 5)
+                }
+
+            })
+            resumeInfoSearchList.value = resumeInfoList.value
         })
-        // const res = await axios.post('https://mock.presstime.cn/mock/67275d10caf0b4e52f13f169/resume/all/resumes', {
-        //     userId: userStore.userId
-        // })
-        // resumeInfoList.value = res.data
-        // resumeInfoSearchList.value = res.data
-        // console.log(`output->res`, res.data)
+
     })
 
 
@@ -358,6 +365,7 @@
             console.log(`output->res`, res)
             modifyResumeInfo.value = res.data
             ElMessage.success('简历解析成功')
+            imageSrc.value = 'http://localhost:8080/api/resume/getGraph?resumeId=' + res.data.id
             sencondemodify.value = true
         })
         return false;
@@ -426,7 +434,7 @@
     //     characteristics: ['能力出众', '经验丰富', '工作稳定']
     // }
 
-    // {
+    // const modifyResumeInfo = ref({
     //     "id": 3,
     //     "name": "张吉惟",
     //     "email": "zhangjiwei@163.com",
@@ -635,7 +643,7 @@
     //             "skillName": "大学英语6级证书（CET-6）"
     //         }
     //     ]
-    // }
+    // })
 
 </script>
 
@@ -652,6 +660,43 @@
         padding-top: 5px;
         padding-bottom: 5px;
     }
+
+    .image-container {
+        width: 100%;
+        height: 665px;
+        /* 你可以根据需要调整高度 */
+        overflow-y: auto;
+        border-radius: 5px;
+
+        /* 使高度可以滚动 */
+    }
+
+    .responsive-image {
+        width: 100%;
+        /* 按照最大宽度比例展示 */
+        height: auto;
+        /* 保持宽高比 */
+    }
+
+
+    /* 定制滚动条样式 */
+    .image-container::-webkit-scrollbar {
+        width: 0px;
+        /* 滚动条宽度 */
+    }
+
+    .image-container::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        /* 滚动条轨道背景颜色 */
+    }
+
+    .image-container::-webkit-scrollbar-thumb {
+        background: #888;
+        /* 滚动条滑块背景颜色 */
+        border-radius: 6px;
+        /* 滚动条滑块圆角 */
+    }
+
 
     .modify-input {
         margin-left: 0px;

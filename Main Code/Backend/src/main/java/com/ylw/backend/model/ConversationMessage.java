@@ -17,9 +17,18 @@ public class ConversationMessage {
     @JoinColumn(name = "conversation_id")
     private Conversation conversation;
 
+//
+//    private String question;
+//
+//    private String message;
+
+
+    @Column(columnDefinition = "LONGTEXT")
     private String question;
 
+    @Column(columnDefinition = "LONGTEXT")
     private String message;
+
 
     @Column(name = "timestamp")
     private LocalDateTime timestamp;

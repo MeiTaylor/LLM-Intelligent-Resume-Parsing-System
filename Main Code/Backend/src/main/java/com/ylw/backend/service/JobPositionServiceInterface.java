@@ -18,5 +18,5 @@ public interface JobPositionServiceInterface {
 
     List<AllResumeWithJobInfo> getAllResumeWithJobInfo(int userId);
 
-    List<ResumeBasicInfo> getAllResumeBasicInfo(int userId);
+    List<ResumeWithJobInfo> getAllResumeBasicInfo(int userId);
 }

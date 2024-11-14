@@ -10,10 +10,10 @@ public class CharacteristicDTO {
 
     private String name;
 
-    @JsonProperty("分数")
+    //@JsonProperty("分数")
     private int score;
 
-    @JsonProperty("原因")
+    //@JsonProperty("原因")
     private String reason;
 
 }

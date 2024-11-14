@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ylw.backend.dto.CharacteristicDTO;
 import com.ylw.backend.dto.JobMatchDTO;
 import com.ylw.backend.model.*;
+import com.ylw.backend.repository.ApplicantRepository;
 import com.ylw.backend.repository.CharacteristicRepository;
 import com.ylw.backend.repository.JobMatchRepository;
 import com.ylw.backend.service.ApplicantServiceInterface;
@@ -25,10 +26,14 @@ public class ApplicantService implements ApplicantServiceInterface {
 
     private final JobMatchRepository jobMatchRepository;
     private final CharacteristicRepository characteristicRepository;
+    private final ApplicantRepository applicantRepository;
 
-    public ApplicantService(JobMatchRepository jobMatchRepository, CharacteristicRepository characteristicRepository) {
+    public ApplicantService(JobMatchRepository jobMatchRepository,
+                            CharacteristicRepository characteristicRepository,
+                            ApplicantRepository applicantRepository) {
         this.jobMatchRepository = jobMatchRepository;
         this.characteristicRepository = characteristicRepository;
+        this.applicantRepository = applicantRepository;
     }
 
     @Override
@@ -162,6 +167,18 @@ public class ApplicantService implements ApplicantServiceInterface {
             String errorMessage = String.format("Failed to read or parse JSON file: %s. Error: %s", jsonFilePath, e.getMessage());
             throw new RuntimeException(errorMessage, e);
         }
+    }
+
+    @Override
+    public Applicant getApplicantDetailedInfo(int applicantId) {
+        // 从数据库获取指定申请人的信息
+        Applicant applicant = applicantRepository.findById(applicantId).orElse(null);
+
+        if (applicant == null) {
+            throw new IllegalArgumentException("Applicant not found for ID: " + applicantId);
+        }
+
+        return applicant;
     }
 
     @Override

@@ -40,29 +40,30 @@
 
                                 <el-row>
                                     <span>最高学历: </span>
-                                    <el-text class="text" margin-bottom="10px">{{ resumeDetails.highestEducation }}</el-text>
+                                    <el-text class="text" margin-bottom="10px">{{ resumeDetails.highestEducation
+                                        }}</el-text>
                                 </el-row>
 
                             </ElCard>
 
                             <ElCard :header="titles[1]" style="margin-bottom: 30px;">
                                 <!-- 工作经历 -->
-                                <template v-for="(item, index) in resumeDetails.workExperience" :key="index">
+                                <template v-for="(item, index) in resumeDetails.workExperiences" :key="index">
                                     <el-row>
                                         <span>公司: </span>
-                                        <el-text class="text" margin-bottom="10px">{{ item.companyName }}</el-text>
+                                        <el-text class="text" margin-bottom="10px">{{ item.地点 }}</el-text>
                                     </el-row>
                                     <el-row>
                                         <span>职位: </span>
-                                        <el-text class="text" margin-bottom="10px">{{ item.position }}</el-text>
+                                        <el-text class="text" margin-bottom="10px">{{ item.地点 }}</el-text>
                                     </el-row>
                                     <el-row>
                                         <span>时间: </span>
-                                        <el-text class="text" margin-bottom="10px">{{ item.time }}</el-text>
+                                        <el-text class="text" margin-bottom="10px">{{ item.时间 }}</el-text>
                                     </el-row>
                                     <el-row>
                                         <span>具体经历: </span>
-                                        <el-text class="text" margin-bottom="10px">{{ item.task }}</el-text>
+                                        <el-text class="text" margin-bottom="10px">{{ item.任务 }}</el-text>
                                     </el-row>
 
                                 </template>
@@ -103,7 +104,7 @@
 
                             <ElCard :header="titles[4]" style="margin-bottom: 30px;">
                                 <!-- 技能 -->
-                                <el-row v-for="(item, index) in resumeDetails.skillCertificate" :key="index">
+                                <el-row v-for="(item, index) in resumeDetails.skillCertificates" :key="index">
                                     <el-text class="text">
                                         {{ item.skillName }}
                                     </el-text>
@@ -133,31 +134,40 @@
 </template>
 
 <script>
-import { ElCard } from 'element-plus';
-// import axios from 'axios'
-import { getResumeParser } from '../../../api/resume'
+    import { ElCard } from 'element-plus';
+    import axios from 'axios'
+    // import { getResumeParser } from '../../../api/resume'
 
-export default {
-    name: 'ResumeDetail',
-    data() {
-        return {
-            titles: ['基本信息', '工作经历', '教育背景', '获奖情况', '技能', '求职信息', '自我评价', 'AI分析'],
-            resumeDetails: {}
+    export default {
+        name: 'ResumeDetail',
+        data() {
+            return {
+                titles: ['基本信息', '工作经历', '教育背景', '获奖情况', '技能', '求职信息', '自我评价', 'AI分析'],
+                resumeDetails: {}
+            }
+        },
+        props: ['RId'],
+        components: { ElCard },
+        mounted() {
+            axios.post('http://localhost:8080/api/applicant/detailedInfo', this.RId, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }).then((res) => {
+                console.log(res)
+                this.resumeDetails = res.data
+            })
+
+            // getResumeParser(this.RId).then((res) => {
+            //     console.log(res)
+            //     this.resumeDetails = res
+            // })
         }
-    },
-    props: ['RId'],
-    components: { ElCard },
-    mounted() {
-        getResumeParser({ id: this.RId }).then((res) => {
-            console.log(res)
-            this.resumeDetails = res
-        })
     }
-}
 </script>
 
 <style scoped>
-/* 
+    /* 
 .text{
     height: 20px;
 } */

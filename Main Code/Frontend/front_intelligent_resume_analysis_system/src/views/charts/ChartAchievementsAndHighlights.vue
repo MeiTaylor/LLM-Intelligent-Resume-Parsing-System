@@ -45,7 +45,7 @@
                 })
                     .then(response => {
                         console.log(response.data);
-                        var data = response.data.characteristics;
+                        var data = response.data;
                         console.log(data);
 
 
@@ -101,9 +101,9 @@
                             },
                             radar: {
                                 indicator: [
-                                    { name: '领导潜力', max: 100 },
-                                    { name: '创新成果', max: 100 },
-                                    { name: '行业影响力', max: 100 }
+                                    { name: '领导潜力', max: 10 },
+                                    { name: '创新成果', max: 10 },
+                                    { name: '行业影响力', max: 10 }
                                 ],
                                 center: ['48.5%', '65%'],
                                 radius: '60%',

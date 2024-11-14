@@ -40,6 +40,12 @@ public class ApplicantController {
         }
     }
 
+    @PostMapping("/detailedInfo")
+    public ResponseEntity<Applicant> getApplicantDetailedInfo(@RequestBody int applicantId) {
+        Applicant applicant = applicantService.getApplicantDetailedInfo(applicantId);
+        return ResponseEntity.ok(applicant);
+    }
+
     @PostMapping("/graph/PersonalJobMatchScore")
     public ResponseEntity<List<JobMatchDTO>> getPersonalJobMatchScore(@RequestBody int applicantId) {
         List<JobMatchDTO> jobMatchDTOList = applicantService.getPersonalJobMatchScore(applicantId);

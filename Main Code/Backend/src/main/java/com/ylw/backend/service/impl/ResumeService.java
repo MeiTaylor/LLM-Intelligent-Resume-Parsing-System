@@ -191,26 +191,44 @@ public class ResumeService implements ResumeServiceInterface {
         existingApplicant.setWorkStability(updatedApplicant.getWorkStability());
         existingApplicant.setWorkStabilityReason(updatedApplicant.getWorkStabilityReason());
 
-        // 显式地清空 Award 集合，然后设置新的集合
+        // 处理 Awards 集合
         if (updatedApplicant.getAwards() != null) {
-            existingApplicant.getAwards().clear(); // 清空现有集合
-            existingApplicant.getAwards().addAll(updatedApplicant.getAwards()); // 添加新内容
+            // 比较并更新 awards 集合
+            updateCollection(existingApplicant.getAwards(), updatedApplicant.getAwards());
         }
 
-        // 显式地清空 WorkExperience 集合，然后设置新的集合
+        // 处理 WorkExperience 集合
         if (updatedApplicant.getWorkExperiences() != null) {
-            existingApplicant.getWorkExperiences().clear(); // 清空现有集合
-            existingApplicant.getWorkExperiences().addAll(updatedApplicant.getWorkExperiences()); // 添加新内容
+            // 比较并更新 work experiences 集合
+            updateCollection(existingApplicant.getWorkExperiences(), updatedApplicant.getWorkExperiences());
         }
 
-        // 显式地清空 SkillCertificate 集合，然后设置新的集合
+        // 处理 SkillCertificates 集合
         if (updatedApplicant.getSkillCertificates() != null) {
-            existingApplicant.getSkillCertificates().clear(); // 清空现有集合
-            existingApplicant.getSkillCertificates().addAll(updatedApplicant.getSkillCertificates()); // 添加新内容
+            // 比较并更新 skill certificates 集合
+            updateCollection(existingApplicant.getSkillCertificates(), updatedApplicant.getSkillCertificates());
         }
+
 
         // 保存更新后的 Applicant
         return applicantRepository.save(existingApplicant);
+    }
+
+    /**
+     * 更新集合内容
+     * @param existingList 已存在的集合
+     * @param newList 新的集合
+     */
+    private <T> void updateCollection(List<T> existingList, List<T> newList) {
+        // 删除已不再包含的项
+        existingList.removeIf(existingItem -> !newList.contains(existingItem));
+
+        // 添加新的项
+        for (T newItem : newList) {
+            if (!existingList.contains(newItem)) {
+                existingList.add(newItem);
+            }
+        }
     }
 
 

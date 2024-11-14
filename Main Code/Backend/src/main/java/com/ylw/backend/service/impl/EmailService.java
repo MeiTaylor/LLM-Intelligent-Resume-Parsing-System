@@ -6,15 +6,20 @@ import com.ylw.backend.dto.CommonReturn;
 import com.ylw.backend.dto.EmailReceiveResumeInfo;
 import com.ylw.backend.model.User;
 import com.ylw.backend.model.UserEmail;
+import com.ylw.backend.repository.EmailMessageRepository;
 import com.ylw.backend.repository.UserEmailRepository;
 import com.ylw.backend.repository.UserRepository;
 import com.ylw.backend.service.EmailServiceInterface;
-import com.ylw.backend.service.impl.EmailUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class EmailService implements EmailServiceInterface {
@@ -22,14 +27,17 @@ public class EmailService implements EmailServiceInterface {
     private final UserEmailRepository userEmailRepository;
     private final UserRepository userRepository;
     private final EmailUtils emailUtils;
+    private final EmailMessageRepository emailMessageRepository;
 
     @Autowired
     public EmailService(UserEmailRepository userEmailRepository,
                         UserRepository userRepository,
-                        EmailUtils emailUtils) {
+                        EmailUtils emailUtils,
+                        EmailMessageRepository emailMessageRepository) {
         this.userEmailRepository = userEmailRepository;
         this.userRepository = userRepository;
         this.emailUtils = emailUtils;
+        this.emailMessageRepository = emailMessageRepository;
     }
 
     @Override
@@ -108,6 +116,30 @@ public class EmailService implements EmailServiceInterface {
     public List<EmailReceiveResumeInfo> fondAllEmailReceiveResumeInfo(int userId) {
 
         return userEmailRepository.findEmailReceiveInfoByUserId(userId);
+    }
+
+    @Override
+    public Map<LocalDate, Integer> getEmailCountForLastWeek(int userId) {
+        LocalDateTime endDate = LocalDateTime.now();
+        LocalDateTime startDate = endDate.minusDays(7);
+
+        // 使用 JPA 查询符合条件的 EmailMessage
+        List<Object[]> emailCounts = emailMessageRepository.getEmailCountsByUserAndDateRange(userId, startDate, endDate);
+
+        // 将查询结果转换为 Map
+        Map<LocalDate, Integer> countsMap = emailCounts.stream()
+                .collect(Collectors.toMap(
+                        row -> (LocalDate) row[0],
+                        row -> ((Long) row[1]).intValue()
+                ));
+
+        // 使用 Java Stream 填充结果，确保 7 天内所有日期都有数据
+        return Stream.iterate(startDate.toLocalDate(), date -> date.plusDays(1))
+                .limit(7)
+                .collect(Collectors.toMap(
+                        date -> date,
+                        date -> countsMap.getOrDefault(date, 0)
+                ));
     }
 }
 

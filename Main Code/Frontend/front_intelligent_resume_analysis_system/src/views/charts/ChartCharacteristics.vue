@@ -45,7 +45,7 @@
                 })
                     .then(response => {
                         console.log(response.data);
-                        var data = response.data.characteristics;
+                        var data = response.data;
                         console.log(data);
 
                         //将返回的数据赋予给data
@@ -98,9 +98,9 @@
                             },
                             radar: {
                                 indicator: [
-                                    { name: '自我驱动性', max: 100 },
-                                    { name: '适应能力', max: 100 },
-                                    { name: '社交能力', max: 100 }
+                                    { name: '自我驱动性', max: 10 },
+                                    { name: '适应能力', max: 10 },
+                                    { name: '社交能力', max: 10 }
                                 ],
                                 center: ['48.5%', '65%'],
                                 radius: '71.5%',

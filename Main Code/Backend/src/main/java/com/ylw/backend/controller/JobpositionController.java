@@ -92,9 +92,9 @@ public class JobpositionController {
     }
 
     //所有简历基本信息
-    @GetMapping("/allResumeBasciInfo")
-    public ResponseEntity<List<ResumeBasicInfo>> getAllResumeBasicInfo(@RequestParam int userId) {
-        List<ResumeBasicInfo> resumeBasicInfos = jobPositionService.getAllResumeBasicInfo(userId);
+    @GetMapping("/allResumeBasicInfo")
+    public ResponseEntity<List<ResumeWithJobInfo>> getAllResumeBasicInfo(@RequestParam int userId) {
+        List<ResumeWithJobInfo> resumeBasicInfos = jobPositionService.getAllResumeBasicInfo(userId);
         return ResponseEntity.ok(resumeBasicInfos);
     }
 

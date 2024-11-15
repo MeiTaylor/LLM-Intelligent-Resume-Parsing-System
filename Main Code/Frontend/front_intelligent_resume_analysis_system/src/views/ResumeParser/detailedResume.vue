@@ -77,14 +77,6 @@
             </el-col>
         </el-row>
 
-        <!-- <el-row :gutter="10" style="height:600px;margin-top: 10px;">
-            <el-col :span="24">
-                <ElCard style="height: 100%;margin-left: 5px;">
-                    简历信息
-                </ElCard>
-
-            </el-col>
-        </el-row> -->
 
     </div>
 </template>

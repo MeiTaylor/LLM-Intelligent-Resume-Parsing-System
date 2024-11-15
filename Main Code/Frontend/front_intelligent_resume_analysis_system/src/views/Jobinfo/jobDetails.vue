@@ -42,11 +42,11 @@
                     </div>
                     <!--TODO: 单个卡片的样式，后面需要改成v-for -->
                     <el-card v-for="resumeInfo in resumeInfoList" class="match-card" shadow="always">
-                        <el-row :space="10">
+                        <el-row :gutter="10">
                             <el-col :span="3">
                                 <img :src="resumeInfo.gender==='女'?womanpicter:manpicter" class="picter">
                             </el-col>
-                            <el-col :span="21">
+                            <el-col :span="16">
                                 <div>
                                     <label style="font-size:larger">{{resumeInfo.name}}</label>
                                     <label class="gender-info">{{resumeInfo.gender}} |
@@ -68,6 +68,10 @@
                                         {{resumeInfo.education}}</label>
                                 </div>
                             </el-col>
+                            <el-col :span="4" style="align-content: center;">
+                                <el-button type="warning" round
+                                    @click="gotoDetailResume(resumeInfo.resumeId)">查看详细简历</el-button>
+                            </el-col>
                         </el-row>
                     </el-card>
                 </el-card>
@@ -80,10 +84,11 @@
     import { ref, computed, onMounted } from 'vue'
     import axios from 'axios'
     import { useUser } from '../../stores/user';
+    import { useRouter } from 'vue-router'
 
     //创建store变量
     const userStore = useUser()
-
+    const router = useRouter()
     const data = ref([])
 
     const defaultProps = {
@@ -114,6 +119,13 @@
         }
     }
 
+    //函数
+    const gotoDetailResume = (resumeId) => {
+        console.log(`output->resumeId`, resumeId)
+        // console.log(`output->router`, router)
+        //进行页面跳转
+        router.push('/talent-profile/' + resumeId)
+    }
     //挂载函数
     onMounted(() => {
         //向后端发送请求

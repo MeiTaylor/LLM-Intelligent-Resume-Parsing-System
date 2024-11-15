@@ -58,7 +58,7 @@
             </el-col>
             <el-col :span="16">
                 <ElCard>
-                    <emailNewAdd></emailNewAdd>
+                    <emailNewAdd :userId="userStore.userId"></emailNewAdd>
 
                 </ElCard>
             </el-col>

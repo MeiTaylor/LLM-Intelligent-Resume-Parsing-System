@@ -93,7 +93,12 @@
                 const chartDom = this.$refs.chart;
                 const myChart = echarts.init(chartDom);
                 var option;
-                axios.get('http://localhost:5177/api/Email/CountLastWeek?userId=1')
+                console.log(`output->this.userId`, this.userId)
+                axios.get('http://localhost:8080/api/email/email-count', {
+                    params: {
+                        userId: this.userId
+                    }
+                })
                     .then((res) => {
                         // console.log(response);
 

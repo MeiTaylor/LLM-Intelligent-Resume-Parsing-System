@@ -4,6 +4,7 @@ import com.ylw.backend.dto.AllEmailInfo;
 import com.ylw.backend.dto.EmailAddInfo;
 import com.ylw.backend.dto.CommonReturn;
 import com.ylw.backend.dto.EmailReceiveResumeInfo;
+import com.ylw.backend.model.EmailMessage;
 import com.ylw.backend.model.User;
 import com.ylw.backend.model.UserEmail;
 import com.ylw.backend.repository.EmailMessageRepository;
@@ -129,7 +130,7 @@ public class EmailService implements EmailServiceInterface {
         // 将查询结果转换为 Map
         Map<LocalDate, Integer> countsMap = emailCounts.stream()
                 .collect(Collectors.toMap(
-                        row -> (LocalDate) row[0],
+                        row -> ((java.sql.Date) row[0]).toLocalDate(),
                         row -> ((Long) row[1]).intValue()
                 ));
 

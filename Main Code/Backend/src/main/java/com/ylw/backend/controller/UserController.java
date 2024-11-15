@@ -35,6 +35,21 @@ public class UserController {
         return userService.createNewAccount(registerSentModel);
     }
 
+    @PostMapping("/addUser")
+    public ResponseEntity<String> addUser(@RequestParam int currentUserId, @RequestBody RegisterSentModel registerSentModel) {
+        try {
+            // 检查当前用户是否有权限
+            if (!userService.isUserAdmin(currentUserId)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Permission denied: You do not have the rights to add a user.");
+            }
+
+            userService.createNewAccountByAdmin(registerSentModel);
+            return ResponseEntity.ok("User added successfully.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + e.getMessage());
+        }
+    }
+
     @PatchMapping("/promoteToAdmin")
     public ResponseEntity<String> promoteToAdmin(@RequestParam int userId) {
         try {

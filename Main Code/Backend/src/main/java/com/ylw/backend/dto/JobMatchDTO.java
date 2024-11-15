@@ -8,11 +8,8 @@ import lombok.Data;
 import lombok.ToString;
 
 @Data
-@Entity
 public class JobMatchDTO {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     //@JsonProperty("职位名称")

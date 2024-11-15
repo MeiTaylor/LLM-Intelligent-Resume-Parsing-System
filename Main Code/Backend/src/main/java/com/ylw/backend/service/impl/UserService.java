@@ -75,6 +75,39 @@ public class UserService implements UserServiceInterface {
     }
 
     @Override
+    public RegisterModelClass createNewAccountByAdmin(RegisterSentModel register) {
+        RegisterModelClass model = new RegisterModelClass();
+        Optional<Company> existingCompany = companyRepository.findByName(register.getName());
+        Optional<User> existingUser = userRepository.findByAccount(register.getAccount());
+
+        if (existingCompany.isPresent()) {
+            model.setIsSuccess(false);
+            model.setMsg("Company already exists.");
+        } else if (existingUser.isPresent()) {
+            model.setIsSuccess(false);
+            model.setMsg("Account already exists.");
+        } else {
+            Company company = new Company();
+            company.setName(register.getName());
+            company.setEmail(register.getEmail());
+            companyRepository.save(company);
+
+            User user = new User();
+            user.setCompanyId(company.getId());
+            user.setAccount(register.getAccount());
+            user.setPassword(register.getPassword());
+            user.setEmail(register.getEmail());
+            user.setRole("normal");
+            user.setCompany(company);
+            userRepository.save(user);
+
+            model.setIsSuccess(true);
+            model.setMsg("Registration successful.");
+        }
+        return model;
+    }
+
+    @Override
     public boolean isUserAdmin(int userId) {
         User user = userRepository.findById(userId).orElse(null);
         if (user == null) {

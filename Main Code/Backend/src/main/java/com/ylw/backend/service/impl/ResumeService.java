@@ -191,24 +191,32 @@ public class ResumeService implements ResumeServiceInterface {
         existingApplicant.setWorkStability(updatedApplicant.getWorkStability());
         existingApplicant.setWorkStabilityReason(updatedApplicant.getWorkStabilityReason());
 
-        // 处理 Awards 集合
+        // 更新 Awards 集合
         if (updatedApplicant.getAwards() != null) {
-            // 比较并更新 awards 集合
-            updateCollection(existingApplicant.getAwards(), updatedApplicant.getAwards());
+            existingApplicant.getAwards().clear();
+            updatedApplicant.getAwards().forEach(award -> {
+                award.setApplicant(existingApplicant);  // 确保关联正确设置
+                existingApplicant.getAwards().add(award);
+            });
         }
 
-        // 处理 WorkExperience 集合
+        // 更新 WorkExperience 集合
         if (updatedApplicant.getWorkExperiences() != null) {
-            // 比较并更新 work experiences 集合
-            updateCollection(existingApplicant.getWorkExperiences(), updatedApplicant.getWorkExperiences());
+            existingApplicant.getWorkExperiences().clear();
+            updatedApplicant.getWorkExperiences().forEach(workExperience -> {
+                workExperience.setApplicant(existingApplicant);  // 确保关联正确设置
+                existingApplicant.getWorkExperiences().add(workExperience);
+            });
         }
 
-        // 处理 SkillCertificates 集合
+        // 更新 SkillCertificates 集合
         if (updatedApplicant.getSkillCertificates() != null) {
-            // 比较并更新 skill certificates 集合
-            updateCollection(existingApplicant.getSkillCertificates(), updatedApplicant.getSkillCertificates());
+            existingApplicant.getSkillCertificates().clear();
+            updatedApplicant.getSkillCertificates().forEach(skillCertificate -> {
+                skillCertificate.setApplicant(existingApplicant);  // 确保关联正确设置
+                existingApplicant.getSkillCertificates().add(skillCertificate);
+            });
         }
-
 
         // 保存更新后的 Applicant
         return applicantRepository.save(existingApplicant);

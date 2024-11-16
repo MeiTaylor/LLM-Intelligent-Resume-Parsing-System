@@ -118,10 +118,6 @@
                                 <el-text class="text">{{ resumeDetails.selfEvaluation }}</el-text>
                             </ElCard>
 
-                            <ElFormItem>
-                                <ElButton type="primary" @click="onSubmit"> 保存修改 </ElButton>
-                                <ElButton> 取消 </ElButton>
-                            </ElFormItem>
 
                         </ElForm>
 
@@ -154,7 +150,7 @@
                     'Content-Type': 'application/json'
                 }
             }).then((res) => {
-                console.log(res)
+                console.log("这是详细简历", res)
                 this.resumeDetails = res.data
             })
 

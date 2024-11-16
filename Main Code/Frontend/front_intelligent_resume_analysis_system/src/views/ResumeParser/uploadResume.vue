@@ -29,7 +29,8 @@
                                 placeholder="年龄小于X检索" />
                         </el-col>
                         <el-col :span="8">
-                            <el-select v-model="searchByEducation" class="m-2" placeholder="按学历检索" size="large">
+                            <el-select v-model="searchByEducation" class="m-2" placeholder="按学历检索" size="large"
+                                clearable>
                                 <el-option v-for="item in EducationOptions" :key="item.value" :label="item.label"
                                     :value="item.value" />
                             </el-select>
@@ -83,7 +84,7 @@
                                 <div style="margin-top: 10px;">
                                     <label style="color: #e8bf88;">匹配岗位:{{resumeInfo.matchJob}}</label>
                                     <label
-                                        style="color:#5a8255; margin-left: 30px;">求职意向:{{resumeInfo.JobIntention}}</label>
+                                        style="color:#5a8255; margin-left: 30px;">求职意向:{{resumeInfo.jobIntention}}</label>
                                 </div>
                                 <div style="margin-top: 10px;  display: flex;align-items: center;">
                                     <el-icon color="gray">
@@ -304,20 +305,7 @@
         resumeInfoSearchList.value = searchList
     }
 
-
-    //开局调用接口更新界面
-    onMounted(async () => {
-        console.log(`output->userStore.id`, userStore.userId)
-        //获取所有的岗位
-        axios.get('http://localhost:8080/api/jobposition/allJobNamesAndIds', {
-            params: {
-                userId: userStore.userId
-            }
-        }).then((res) => {
-            console.log(`output->res`, res)
-            allJobList.value = res.data
-        })
-        //TODO: 这里的接口地址需要改成后端的接口地址
+    const fetchResumeData = () => {
         axios.get('http://localhost:8080/api/jobposition/allResumeBasicInfo', {
             params: {
                 userId: userStore.userId
@@ -334,6 +322,22 @@
             })
             resumeInfoSearchList.value = resumeInfoList.value
         })
+    }
+
+    //开局调用接口更新界面
+    onMounted(async () => {
+        console.log(`output->userStore.id`, userStore.userId)
+        //获取所有的岗位
+        axios.get('http://localhost:8080/api/jobposition/allJobNamesAndIds', {
+            params: {
+                userId: userStore.userId
+            }
+        }).then((res) => {
+            console.log(`output->res`, res)
+            allJobList.value = res.data
+        })
+        //TODO: 这里的接口地址需要改成后端的接口地址
+        fetchResumeData()
 
     })
 
@@ -360,7 +364,7 @@
         formData.forEach((value, key) => console.log(key, value));  // 检查 FormData 内容
         ElMessage.success('上传成功,正在解析简历')
         // formData['file'] = file
-        console.log(`output->formData`, formData)
+        console.log(`output->这是二次formData`, formData)
         axios.post('http://localhost:8080/api/resume/uploadResume', formData).then((res) => {
             console.log(`output->res`, res)
             modifyResumeInfo.value = res.data
@@ -398,7 +402,7 @@
 
     //TODO:后面需要将这个接口发送到后端上传二次修改信息
     const submitForm = (ruleFormRef) => {
-        console.log(`output->modifyResumeInfo`, modifyResumeInfo.value)
+        console.log(`这是二次修改上次信息`, modifyResumeInfo.value)
         console.log(`正在修改简历`)
         axios.post('http://localhost:8080/api/resume/updateApplicant', modifyResumeInfo.value).then((res) => {
             console.log(`output->res`, res)
@@ -409,11 +413,14 @@
                 ElMessage.error('更新失败')
             }
         })
+
+        fetchResumeData()
     }
 
     //关闭抽屉
     const handleClose = () => {
         sencondemodify.value = false
+        fetchResumeData()
     }
 
 

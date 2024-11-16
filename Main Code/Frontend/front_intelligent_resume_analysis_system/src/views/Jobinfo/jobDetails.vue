@@ -55,10 +55,13 @@
                                     <label v-for="characteristic in resumeInfo.characteristics"
                                         class="characteristic">{{characteristic}}</label>
                                 </div>
-                                <div style="margin-top: 10px;">
+                                <div style="margin-top: 10px; display: flex; align-items: center;">
                                     <label style="color: #e8bf88;">匹配岗位:{{resumeInfo.matchJob}}</label>
                                     <label
-                                        style="color:#5a8255; margin-left: 30px;">求职意向:{{resumeInfo.JobIntention}}</label>
+                                        style="color:#5a8255; margin-left: 30px;">求职意向:{{resumeInfo.jobIntention}}</label>
+                                    <el-rate style="margin-left: 30px;" v-model="resumeInfo.score" :max="5" disabled
+                                        text-color="#ff9900" disabled-void-color="#ccd1d6"
+                                        score-template="{value} points" class="custom-rate" />
                                 </div>
                                 <div style="margin-top: 10px;  display: flex;align-items: center;">
                                     <el-icon color="gray">
@@ -162,6 +165,8 @@
                     if (element.characteristics.length > 3) {
                         element.characteristics = element.characteristics.slice(0, 3)
                     }
+                    //将所有分数转化为整数
+                    element.score = element.score / 20
                 })
             })
             //使用第一个默认的数据
@@ -192,6 +197,25 @@
 </script>
 
 <style scoped>
+    ::v-deep .el-rate {
+        height: 10px;
+    }
+
+    ::v-deep span.el-rate__item {
+        width: 16px;
+        /* 设置星星大小 */
+    }
+
+    .custom-rate .el-rate__item {
+        margin-right: 3px;
+        /* 调整星星之间的距离 */
+    }
+
+    .custom-rate .el-rate__item:last-child {
+        margin-right: 0;
+        /* 去掉最后一个星星的右边距 */
+    }
+
     .no-resume {
         color: #ff6f61;
         /* 设置文本颜色 */

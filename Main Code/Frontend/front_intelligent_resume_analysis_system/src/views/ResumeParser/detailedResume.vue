@@ -31,7 +31,7 @@
                             <el-switch v-model="isChat"
                                 style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949" />
                         </el-col>
-                        <el-col span="20">
+                        <el-col :span="20">
                             <span>人才画像/chat</span>
                         </el-col>
                     </el-row>

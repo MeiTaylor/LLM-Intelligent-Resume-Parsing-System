@@ -81,8 +81,8 @@
                                 {
                                     name: 'Access From',
                                     type: 'pie',
-                                    radius: ['40%', '70%'],
-                                    center: ['50%', '70%'],
+                                    radius: ['40%', '60%'],
+                                    center: ['50%', '60%'],
                                     // adjust the start angle
                                     startAngle: 180,
                                     label: {

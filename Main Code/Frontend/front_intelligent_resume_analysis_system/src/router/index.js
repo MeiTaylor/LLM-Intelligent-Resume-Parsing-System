@@ -102,13 +102,6 @@ export const constantRoutes = {
         meta: { title: '上传简历', icon: 'document' }
       },
       {
-        path: '/previewAndAlter/:id([a-z0-9-]+)',
-        component: () => import('../views/ResumeParser/previewAndAlter.vue'),
-        name: 'preview-and-alter',
-        hidden: true,
-        meta: { title: '预览和修改', icon: 'document' }
-      },
-      {
         path: '/statisticResume',
         component: () => import('../views/ResumeParser/statisticView.vue'),
         name: 'statistic',
@@ -134,13 +127,6 @@ export const constantRoutes = {
         name: 'job-upload',
         component: () => import('../views/Jobinfo/uploadJob.vue'),
         meta: { title: '上传岗位', icon: 'document' }
-      },
-      {
-        path: '/job-matching/:jid([a-z0-9-]+)',
-        name: 'job-matching',
-        component: () => import('../views/Jobinfo/jobMatching.vue'),
-        hidden: true,
-        meta: { title: '匹配结果', icon: 'document' }
       }
       ]
     },
@@ -233,13 +219,6 @@ export const asyncRoutes = {
         meta: { title: '上传简历', icon: 'document' }
       },
       {
-        path: '/previewAndAlter/:id([a-z0-9-]+)',
-        component: () => import('../views/ResumeParser/previewAndAlter.vue'),
-        name: 'preview-and-alter',
-        hidden: true,
-        meta: { title: '预览和修改', icon: 'document' }
-      },
-      {
         path: '/statisticResume',
         component: () => import('../views/ResumeParser/statisticView.vue'),
         name: 'statistic',
@@ -255,17 +234,30 @@ export const asyncRoutes = {
       children: [{
         path: '/job-info',
         name: 'job--info-details',
+        // component: () => import('../views/Jobinfo/jobDetails.vue'),
+        // component: () => import('../views/Jobinfo/newJobDetails.vue'),
         component: () => import('../views/Jobinfo/jobDetails.vue'),
         meta: { title: '人岗匹配', icon: 'document' }
       },
       {
-        path: '/job-match',
-        name: 'job-match',
+        path: '/job-upload',
+        name: 'job-upload',
         component: () => import('../views/Jobinfo/uploadJob.vue'),
         meta: { title: '上传岗位', icon: 'document' }
       }
       ]
     },
+    {
+      path: '/manage-email',
+      name: 'manage-email',
+      component: Layout,
+      children: [{
+        path: '/manage-email',
+        name: 'manage-email-details',
+        component: () => import('../views/email/email.vue'),
+        meta: { title: '邮箱管理', icon: 'document' }
+      }]
+    }
 
     // 错误路由重定向
     //  { path: '*', redirect: '/404', hidden: true }

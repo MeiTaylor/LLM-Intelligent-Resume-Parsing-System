@@ -12,7 +12,7 @@
 
       <el-dropdown class="avatar-container right-menu-item hover-effect" trigger="click">
         <div class="avatar-wrapper">
-          <img :src="avatar" class="user-avatar">
+          <img style="border-radius: 50%;" :src="avatar" class="user-avatar">
           <i class="el-icon-caret-bottom"></i>
         </div>
         <el-dropdown-menu slot="dropdown" class="user-dropdown">
@@ -34,127 +34,140 @@
 </template>
 
 <script>
-// import { mapGetters } from 'vuex'
-import { mapState } from 'pinia'
-import { useSidebar } from '../../stores/app'
-import { useSetting } from '../../stores/setting'
-import pinia from '../../stores/index'
+  // import { mapGetters } from 'vuex'
+  import { mapState } from 'pinia'
+  import { useSidebar } from '../../stores/app'
+  import { useSetting } from '../../stores/setting'
+  import pinia from '../../stores/index'
 
-import Breadcrumb from '@/components/Breadcrumb/index.vue'
-import Hamburger from '@/components/Hamburger/index.vue'
-import Screenfull from '@/components/Screenfull/index.vue'
-import Search from '@/components/HeaderSearch/index.vue'
-import defaultAvatar from '@/assets/images/default_avatar.png'
+  import Breadcrumb from '@/components/Breadcrumb/index.vue'
+  import Hamburger from '@/components/Hamburger/index.vue'
+  import Screenfull from '@/components/Screenfull/index.vue'
+  import Search from '@/components/HeaderSearch/index.vue'
+  import defaultAvatar from '@/assets/images/img.jpg'
 
-const sidebar = useSidebar(pinia)
+  const sidebar = useSidebar(pinia)
 
-export default {
-  components: {
-    Breadcrumb,
-    Hamburger,
-    Screenfull,
-    Search
-  },
-  computed: {
-    ...mapState(useSidebar, {
-      sidebar: store => store.sidebar,
-      device: store => store.device
-    })
-  },
-  data() {
-    return {
-      avatar: defaultAvatar
-    }
-  },
-  methods: {
-    toggleSideBar() {
-      // this.$store.dispatch('app/toggleSideBar')
-      sidebar.toggleSideBar()
+  export default {
+    components: {
+      Breadcrumb,
+      Hamburger,
+      Screenfull,
+      Search
     },
-    logout() {
-      // await this.$store.dispatch('user/logout')
-      // this.$store.dispatch('user/logout')
-      this.$router.push(`/Login`)
+    computed: {
+      ...mapState(useSidebar, {
+        sidebar: store => store.sidebar,
+        device: store => store.device
+      })
+    },
+    data() {
+      return {
+        avatar: defaultAvatar
+      }
+    },
+    methods: {
+      toggleSideBar() {
+        // this.$store.dispatch('app/toggleSideBar')
+        sidebar.toggleSideBar()
+      },
+      logout() {
+        // await this.$store.dispatch('user/logout')
+        // this.$store.dispatch('user/logout')
+        // 清除 Local Storage
+        localStorage.clear();
+
+        // // 清除 Session Storage
+        sessionStorage.clear();
+
+        // // 清除 Cookies
+        document.cookie.split(";").forEach(function (c) {
+          document.cookie = c.trim().split("=")[0] + "=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/";
+        });
+
+        // // 刷新页面
+        location.reload();
+        this.$router.push(`/Login`)
+      }
     }
   }
-}
 </script>
 
 <style lang="scss" scoped>
-.navbar {
-  height: 50px;
-  overflow: hidden;
-  position: relative;
-  background: #fff;
-  box-shadow: 0 1px 4px rgba(0, 21, 41, .08);
+  .navbar {
+    height: 50px;
+    overflow: hidden;
+    position: relative;
+    background: #fff;
+    box-shadow: 0 1px 4px rgba(0, 21, 41, .08);
 
-  .hamburger-container {
-    line-height: 46px;
-    height: 100%;
-    float: left;
-    cursor: pointer;
-    transition: background .3s;
-    -webkit-tap-highlight-color: transparent;
-
-    &:hover {
-      background: rgba(0, 0, 0, .025)
-    }
-  }
-
-  .breadcrumb-container {
-    float: left;
-  }
-
-  .right-menu {
-    float: right;
-    height: 100%;
-    line-height: 50px;
-
-    &:focus {
-      outline: none;
-    }
-
-    .right-menu-item {
-      display: inline-block;
-      padding: 0 8px;
+    .hamburger-container {
+      line-height: 46px;
       height: 100%;
-      font-size: 18px;
-      color: #5a5e66;
-      vertical-align: text-bottom;
+      float: left;
+      cursor: pointer;
+      transition: background .3s;
+      -webkit-tap-highlight-color: transparent;
 
-      &.hover-effect {
-        cursor: pointer;
-        transition: background .3s;
-
-        &:hover {
-          background: rgba(0, 0, 0, .025)
-        }
+      &:hover {
+        background: rgba(0, 0, 0, .025)
       }
     }
 
-    .avatar-container {
-      margin-right: 30px;
+    .breadcrumb-container {
+      float: left;
+    }
 
-      .avatar-wrapper {
-        margin-top: 5px;
-        position: relative;
+    .right-menu {
+      float: right;
+      height: 100%;
+      line-height: 50px;
 
-        .user-avatar {
+      &:focus {
+        outline: none;
+      }
+
+      .right-menu-item {
+        display: inline-block;
+        padding: 0 8px;
+        height: 100%;
+        font-size: 18px;
+        color: #5a5e66;
+        vertical-align: text-bottom;
+
+        &.hover-effect {
           cursor: pointer;
-          width: 40px;
-          height: 40px;
-          border-radius: 10px;
+          transition: background .3s;
+
+          &:hover {
+            background: rgba(0, 0, 0, .025)
+          }
         }
+      }
 
-        .el-icon-caret-bottom {
-          cursor: pointer;
-          position: absolute;
-          right: -20px;
-          top: 25px;
-          font-size: 12px;
+      .avatar-container {
+        margin-right: 30px;
+
+        .avatar-wrapper {
+          margin-top: 5px;
+          position: relative;
+
+          .user-avatar {
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+          }
+
+          .el-icon-caret-bottom {
+            cursor: pointer;
+            position: absolute;
+            right: -20px;
+            top: 25px;
+            font-size: 12px;
+          }
         }
       }
     }
   }
-}
 </style>

@@ -37,7 +37,7 @@ public class JobpositionController {
     }
 
     @PostMapping("/add")
-    public JobAddReturnMsg addJobPosition(@RequestParam JobAddDTO jobAddDTO) {
+    public JobAddReturnMsg addJobPosition(@RequestBody JobAddDTO jobAddDTO) {
         return jobPositionService.addJobPositionByJobAddDTO(jobAddDTO);
     }
 

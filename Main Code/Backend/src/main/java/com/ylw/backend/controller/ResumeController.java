@@ -118,9 +118,6 @@ public class ResumeController {
         }
     }
 
-    //返回applicantid对应的简历图片
-
-
     @PostMapping("/updateApplicant")
     public ResponseEntity<String> updateApplicant(@RequestBody ApplicantDTO updatedApplicant) {
         try {
@@ -131,9 +128,6 @@ public class ResumeController {
             return ResponseEntity.badRequest().body("更新失败: " + e.getMessage());
         }
     }
-
-
-
 
     @PostMapping("/test")
     public String test() {

@@ -1,14 +1,13 @@
 package com.ylw.backend.controller;
 
+import com.ylw.backend.dto.*;
 import com.ylw.backend.service.UserServiceInterface;
-import com.ylw.backend.dto.LoginModelClass;
-import com.ylw.backend.dto.LoginSentModel;
-import com.ylw.backend.dto.RegisterModelClass;
-import com.ylw.backend.dto.RegisterSentModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
@@ -43,7 +42,10 @@ public class UserController {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Permission denied: You do not have the rights to add a user.");
             }
 
-            userService.createNewAccountByAdmin(registerSentModel);
+            RegisterModelClass registerModelClass = userService.createNewAccountByAdmin(registerSentModel, currentUserId);
+            if (!registerModelClass.IsSuccess) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to add user: " + registerModelClass.msg);
+            }
             return ResponseEntity.ok("User added successfully.");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + e.getMessage());
@@ -77,6 +79,13 @@ public class UserController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + e.getMessage());
         }
+    }
+
+    //返回用户所属公司的所有用户列表
+    @GetMapping("/allUsers")
+    public ResponseEntity<List<UserDTO>> getAllUsers(@RequestParam int userId) {
+        List<UserDTO> users = userService.findUsersByCompanyId(userId);
+        return ResponseEntity.ok(users);
     }
 
 }

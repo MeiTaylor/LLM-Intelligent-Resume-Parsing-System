@@ -1,5 +1,6 @@
 package com.ylw.backend.service.impl;
 
+import com.ylw.backend.dto.UserDTO;
 import com.ylw.backend.model.Company;
 import com.ylw.backend.model.User;
 import com.ylw.backend.repository.CompanyRepository;
@@ -11,6 +12,8 @@ import com.ylw.backend.service.UserServiceInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -75,22 +78,15 @@ public class UserService implements UserServiceInterface {
     }
 
     @Override
-    public RegisterModelClass createNewAccountByAdmin(RegisterSentModel register) {
+    public RegisterModelClass createNewAccountByAdmin(RegisterSentModel register, int currentUserId) {
         RegisterModelClass model = new RegisterModelClass();
-        Optional<Company> existingCompany = companyRepository.findByName(register.getName());
         Optional<User> existingUser = userRepository.findByAccount(register.getAccount());
 
-        if (existingCompany.isPresent()) {
-            model.setIsSuccess(false);
-            model.setMsg("Company already exists.");
-        } else if (existingUser.isPresent()) {
+        if (existingUser.isPresent()) {
             model.setIsSuccess(false);
             model.setMsg("Account already exists.");
         } else {
-            Company company = new Company();
-            company.setName(register.getName());
-            company.setEmail(register.getEmail());
-            companyRepository.save(company);
+            Company company = userRepository.findById(currentUserId).orElseThrow(() -> new RuntimeException("Current user not found")).getCompany();
 
             User user = new User();
             user.setCompanyId(company.getId());
@@ -139,5 +135,21 @@ public class UserService implements UserServiceInterface {
         } else {
             throw new RuntimeException("User not found with ID: " + userId);
         }
+    }
+
+    //找到用户所属公司的所有用户
+    @Override
+    public List<UserDTO> findUsersByCompanyId(int companyId) {
+        List<User> users = userRepository.findByCompanyId(companyId);
+        List<UserDTO> userDTOS = new ArrayList<>();
+        for (User user : users) {
+            UserDTO userDTO = new UserDTO();
+            userDTO.setId(user.getId());
+            userDTO.setAccount(user.getAccount());
+            userDTO.setEmail(user.getEmail());
+            userDTO.setRole(user.getRole());
+            userDTOS.add(userDTO);
+        }
+        return userDTOS;
     }
 }

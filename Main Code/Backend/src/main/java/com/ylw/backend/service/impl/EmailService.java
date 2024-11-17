@@ -123,7 +123,7 @@ public class EmailService implements EmailServiceInterface {
     @Override
     public Map<LocalDate, Integer> getEmailCountForLastWeek(int userId) {
         LocalDateTime endDate = LocalDateTime.now();
-        LocalDateTime startDate = endDate.minusDays(7);
+        LocalDateTime startDate = endDate.minusDays(6);
 
         // 使用 JPA 查询符合条件的 EmailMessage
         List<Object[]> emailCounts = emailMessageRepository.getEmailCountsByUserAndDateRange(userId, startDate, endDate);

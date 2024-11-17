@@ -82,10 +82,10 @@ public class UserController {
     }
 
     // 恢复禁用的账号
-    @PatchMapping("/recover")
-    public ResponseEntity<String> recoverUser(@RequestParam int userId) {
+    @PostMapping("/recover")
+    public ResponseEntity<String> recoverUser(@RequestBody WebSentUserId webSentUserId) {
         try {
-            userService.recoverUser(userId);
+            userService.recoverUser(webSentUserId.getUserId());
             return ResponseEntity.ok("User recovered successfully.");
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found: " + e.getMessage());

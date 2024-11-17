@@ -197,8 +197,8 @@ public class JobPositionService implements JobPositionServiceInterface {
                 resumeWithJobInfo.setJobIntention(applicant.getJobIntention());
                 resumeWithJobInfo.setSchool(applicant.getGraduatedFrom());
 
-                List<String> characteristics = applicant.getApplicantProfile() != null && applicant.getApplicantProfile().getCharacteristics() != null
-                        ? applicant.getApplicantProfile().getCharacteristics().stream().map(Characteristic::getName).collect(Collectors.toList())
+                List<String> characteristics = applicant.getApplicantProfile() != null && applicant.getApplicantProfile().getWorkTraits() != null
+                        ? applicant.getApplicantProfile().getWorkTraits().stream().map(WorkTrait::getTrait).collect(Collectors.toList())
                         : new ArrayList<>();
                 resumeWithJobInfo.setCharacteristics(characteristics);
 
@@ -255,8 +255,8 @@ public class JobPositionService implements JobPositionServiceInterface {
                 }
                 resumeWithJobInfo.setSchool(applicant.getGraduatedFrom());
 
-                List<String> characteristics = applicant.getApplicantProfile() != null && applicant.getApplicantProfile().getCharacteristics() != null
-                        ? applicant.getApplicantProfile().getCharacteristics().stream().map(Characteristic::getName).collect(Collectors.toList())
+                List<String> characteristics = applicant.getApplicantProfile() != null && applicant.getApplicantProfile().getWorkTraits() != null
+                        ? applicant.getApplicantProfile().getWorkTraits().stream().map(WorkTrait::getTrait).collect(Collectors.toList())
                         : new ArrayList<>();
                 resumeWithJobInfo.setCharacteristics(characteristics);
 

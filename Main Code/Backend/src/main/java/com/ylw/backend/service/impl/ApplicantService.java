@@ -122,7 +122,7 @@ public class ApplicantService implements ApplicantServiceInterface {
                 workExperience.setTask(exp.get("职责"));
                 workExperience.setTime(exp.get("开始时间") + " - " + exp.get("结束时间"));
                 workExperience.setCompanyName(""); // 需要根据实际数据设置
-                workExperience.setWorkLocation("工作地点");
+                workExperience.setWorkLocation(exp.get("工作地点"));
                 workExperience.setApplicant(applicant);
                 workExperiences.add(workExperience);
             }

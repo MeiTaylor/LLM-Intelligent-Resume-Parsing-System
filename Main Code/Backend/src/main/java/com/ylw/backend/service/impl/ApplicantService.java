@@ -131,7 +131,11 @@ public class ApplicantService implements ApplicantServiceInterface {
             if (totalWorkYearsValue instanceof Integer) {
                 applicant.setTotalWorkYears((Integer) totalWorkYearsValue);
             } else {
-                applicant.setTotalWorkYears(0);
+                try {
+                    applicant.setTotalWorkYears(Integer.parseInt((String) totalWorkYearsValue));
+                } catch (NumberFormatException e) {
+                    applicant.setTotalWorkYears(0);
+                }
             }
 
             // 设置技能证书

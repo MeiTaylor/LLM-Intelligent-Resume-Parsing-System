@@ -9,6 +9,7 @@ import com.ylw.backend.model.UserEmail;
 import com.ylw.backend.repository.EmailMessageRepository;
 import com.ylw.backend.repository.UserEmailRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +27,8 @@ public class  EmailMoniterSercive {
     private final EmailService emailService;
     private final ResumeService resumeService;
     private final EmailMessageRepository emailMessageRepository;
+    @Value("${resume.file.root}")
+    private String emailResumePath;
 
     @Autowired
     public EmailMoniterSercive(UserEmailRepository userEmailRepository, EmailUtils emailUtils, EmailService emailService,ResumeService resumeService,EmailMessageRepository emailMessageRepository) {
@@ -42,7 +45,7 @@ public class  EmailMoniterSercive {
         for (EmailMoniterInfo email : emails) {
             System.out.println(email);
             //地址， 授权码  => [四个信息]
-            List<Map<String, Object>> test = emailUtils.getNewEmails(email.getEmailAddress(),email.getEmailPassword(),"D:\\study\\resume");
+            List<Map<String, Object>> test = emailUtils.getNewEmails(email.getEmailAddress(),email.getEmailPassword(),emailResumePath);
             //
             for (Map<String, Object> map : test) {
                 String path =  ((List<String>)map.get("attachment")).get(0);

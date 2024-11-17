@@ -32,7 +32,7 @@ public class EmailUtils {
     // 定义附件保存的根路径
 //    private static final String SAVE_PATH = "E:\\study\\Big_ruan\\code\\my_code\\down_resume";
     @Value("${resume.file.root}")
-    private static String SAVE_PATH;
+    private String SAVE_PATH;
 //    private static final String SAVE_PATH = "D:\\study\\resume";
 
 

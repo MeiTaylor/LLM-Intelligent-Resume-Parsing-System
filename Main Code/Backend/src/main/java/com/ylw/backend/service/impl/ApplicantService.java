@@ -121,14 +121,13 @@ public class ApplicantService implements ApplicantServiceInterface {
                 workExperience.setPosition(exp.get("职位"));
                 workExperience.setTask(exp.get("职责"));
                 workExperience.setTime(exp.get("开始时间") + " - " + exp.get("结束时间"));
-                workExperience.setCompanyName(""); // 需要根据实际数据设置
-                workExperience.setWorkLocation(exp.get("工作地点"));
+                workExperience.setCompanyName(exp.get("工作地点")); // 需要根据实际数据设置
                 workExperience.setApplicant(applicant);
                 workExperiences.add(workExperience);
             }
             applicant.setWorkExperiences(workExperiences);
 
-            Object totalWorkYearsValue = jsonMap.get("工作总时间");
+            Object totalWorkYearsValue = jsonMap.get("工作年限");
             if (totalWorkYearsValue instanceof Integer) {
                 applicant.setTotalWorkYears((Integer) totalWorkYearsValue);
             } else {
@@ -170,7 +169,7 @@ public class ApplicantService implements ApplicantServiceInterface {
             //profile.setApplicant(applicant); //之前没加这个
 
             // 设置工作特征
-            List<String> workTraits = (List<String>) jsonMap.get("工作特性标签");
+            List<String> workTraits = (List<String>) jsonMap.get("个人特点标签");
             List<WorkTrait> workTraitList = new ArrayList<>();
             for (String trait : workTraits) {
                 WorkTrait workTrait = new WorkTrait();

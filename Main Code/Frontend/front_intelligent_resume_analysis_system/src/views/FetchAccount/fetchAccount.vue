@@ -35,10 +35,17 @@
       <el-table-column label="权限" prop="role">
 
       </el-table-column>
+      <el-table-column label="是否启用">
+        <template #default="scope">
+          <label style="color: #606266;" v-if="scope.row.disabled">未启用</label>
+          <label style="color: #606266;" v-else>已启用</label>
+        </template>
+      </el-table-column>
       <el-table-column label="操作栏">
         <template #default="scope">
-          <el-button type="danger" @click="deleteUser(scope.row.id)">删除账户</el-button>
-          <el-button type="success" @click="handlePause(scope.row)">修改信息</el-button>
+          <el-button type="primary" v-if="scope.row.disabled" @click="startUser(scope.row.id)">开启使用</el-button>
+          <el-button type="danger" v-else @click="stopUser(scope.row.id)">暂停使用</el-button>
+          <!-- <el-button type="success" @click="handlePause(scope.row)">修改信息</el-button> -->
         </template>
       </el-table-column>
 
@@ -102,6 +109,7 @@
 
   const router = useRouter();
 
+
   // 响应式数据
   const roleDialog = reactive({
     visible: false,
@@ -164,10 +172,36 @@
     isAdd.value = true;
   };
 
-  //删除用户
-  const deleteUser = (userId) => {
-    console.log(`output->userId`, userId)
-  }
+  //暂停使用用户
+  const stopUser = (id) => {
+    axios.delete('http://localhost:8080/api/users/delete', {
+      params: {
+        currentUserId: userStore.userId,
+        userIdToDelete: id
+      }
+    }).then((res) => {
+      console.log(res);
+      ElMessage({
+        message: '暂停成功',
+        type: 'success'
+      });
+      getUserList();
+    });
+  };
+
+  //开启使用用户
+  const startUser = (id) => {
+    axios.post('http://localhost:8080/api/users/recover', {
+      userId: id
+    }).then((res) => {
+      console.log(res);
+      ElMessage({
+        message: '开启成功',
+        type: 'success'
+      });
+      getUserList();
+    });
+  };
 
   const saveUser = () => {
     const companyId = parseInt(userStore.companyId);

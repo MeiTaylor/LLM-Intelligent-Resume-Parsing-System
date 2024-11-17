@@ -243,21 +243,16 @@
         //向后端发送post请求
         axios.post('http://localhost:8080/api/email/add', sendData).then((res) => {
             if (res.data.code == 20000) {
-                const addData = {
-                    "emailAddress": emailAddInfo.email,
-                    "syncEnabled": true,
-                    "emailId": res.data.emailId
-                }
-                EmailData.value.push(addData)
                 console.log(`output->res`, res)
                 ElMessage({
                     message: '邮箱添加成功',
                     type: 'success',
                 })
                 dialogEmailAddVisible.value = false
+                getAllEmailInfo()
             } else {
                 ElMessage({
-                    message: '该邮箱已存在,邮箱添加失败',
+                    message: res.data.message,
                     type: 'error',
                 })
             }

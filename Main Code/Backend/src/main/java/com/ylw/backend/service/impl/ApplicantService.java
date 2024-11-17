@@ -165,7 +165,7 @@ public class ApplicantService implements ApplicantServiceInterface {
             //profile.setApplicant(applicant); //之前没加这个
 
             // 设置工作特征
-            List<String> workTraits = (List<String>) jsonMap.get("工作特性标签");
+            List<String> workTraits = (List<String>) jsonMap.get("个人特点标签");
             List<WorkTrait> workTraitList = new ArrayList<>();
             for (String trait : workTraits) {
                 WorkTrait workTrait = new WorkTrait();

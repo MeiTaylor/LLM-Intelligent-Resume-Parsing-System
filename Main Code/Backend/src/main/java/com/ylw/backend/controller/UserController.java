@@ -81,6 +81,19 @@ public class UserController {
         }
     }
 
+    // 恢复禁用的账号
+    @PatchMapping("/recover")
+    public ResponseEntity<String> recoverUser(@RequestParam int userId) {
+        try {
+            userService.recoverUser(userId);
+            return ResponseEntity.ok("User recovered successfully.");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found: " + e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + e.getMessage());
+        }
+    }
+
     //返回用户所属公司的所有用户列表
     @GetMapping("/allUsers")
     public ResponseEntity<List<UserDTO>> getAllUsers(@RequestParam int userId) {

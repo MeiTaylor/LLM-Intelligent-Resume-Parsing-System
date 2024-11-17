@@ -19,6 +19,9 @@ public interface UserServiceInterface {
 
     void deleteUser(int userId);
 
+    //写一个新方法，恢复禁用的账号
+    void recoverUser(int userId);
+
     //找到用户所属公司的所有用户
     List<UserDTO> findUsersByCompanyId(int companyId);
 

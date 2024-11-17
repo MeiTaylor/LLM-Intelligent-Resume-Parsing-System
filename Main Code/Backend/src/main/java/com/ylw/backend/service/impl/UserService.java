@@ -146,6 +146,19 @@ public class UserService implements UserServiceInterface {
         }
     }
 
+    @Override
+    public void recoverUser(int userId) {
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            user.setDisabled(false);
+            userRepository.save(user);
+        } else {
+            throw new RuntimeException("User not found with ID: " + userId);
+        }
+    }
+
+
     //找到用户所属公司的所有用户
     @Override
     public List<UserDTO> findUsersByCompanyId(int companyId) {
@@ -157,6 +170,7 @@ public class UserService implements UserServiceInterface {
             userDTO.setAccount(user.getAccount());
             userDTO.setEmail(user.getEmail());
             userDTO.setRole(user.getRole());
+            userDTO.setDisabled(user.isDisabled());
             userDTOS.add(userDTO);
         }
         return userDTOS;

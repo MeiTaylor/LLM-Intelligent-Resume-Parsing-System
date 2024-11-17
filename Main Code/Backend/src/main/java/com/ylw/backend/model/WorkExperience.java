@@ -27,6 +27,8 @@ public class WorkExperience {
     @JsonProperty("任务")
     private String task;
 
+    private String workLocation;
+
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "applicant_id")

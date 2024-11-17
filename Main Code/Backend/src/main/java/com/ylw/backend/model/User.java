@@ -29,6 +29,10 @@ public class User {
     @Column
     private String role;
 
+    //设计一个新属性，表明这个账号是否被停用了
+    @Column
+    private boolean disabled = false;
+
     @Column(name = "company_id", insertable = false, updatable = false)
     private int companyId;
 

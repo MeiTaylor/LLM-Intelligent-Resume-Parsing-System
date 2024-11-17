@@ -88,4 +88,17 @@ public class UserController {
         return ResponseEntity.ok(users);
     }
 
+    //根据传入的userDto,修改用户信息
+    @PatchMapping("/updateUser")
+    public ResponseEntity<String> updateUser(@RequestBody UserDTO userDTO) {
+        try {
+            userService.updateUser(userDTO);
+            return ResponseEntity.ok("User information updated successfully.");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found: " + e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + e.getMessage());
+        }
+    }
+
 }

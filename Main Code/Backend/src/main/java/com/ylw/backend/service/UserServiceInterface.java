@@ -21,4 +21,7 @@ public interface UserServiceInterface {
 
     //找到用户所属公司的所有用户
     List<UserDTO> findUsersByCompanyId(int companyId);
+
+    //根据传入的userdto,修改用户信息
+    void updateUser(UserDTO userDTO);
 }

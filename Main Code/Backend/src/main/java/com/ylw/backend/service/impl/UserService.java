@@ -33,11 +33,17 @@ public class UserService implements UserServiceInterface {
         Optional<User> userOptional = userRepository.findByAccount(account);
 
         LoginModelClass model = new LoginModelClass();
-        if (userOptional.isPresent() && userOptional.get().getPassword().equals(password)) {
+        if (userOptional.isPresent()) {
             User user = userOptional.get();
-            model.setCode(20000);
-            model.setUserId(user.getId());
-            model.setData(user.getRole());
+            if (user.isDisabled()) {
+                model.setCode(60204); // 用户被停用
+            } else if (user.getPassword().equals(password)) {
+                model.setCode(20000);
+                model.setUserId(user.getId());
+                model.setData(user.getRole());
+            } else {
+                model.setCode(60204); // 用户不存在或密码错误
+            }
         } else {
             model.setCode(60204); // 用户不存在或密码错误
         }
@@ -130,8 +136,11 @@ public class UserService implements UserServiceInterface {
 
     @Override
     public void deleteUser(int userId) {
-        if (userRepository.existsById(userId)) {
-            userRepository.deleteById(userId);
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            user.setDisabled(true);
+            userRepository.save(user);
         } else {
             throw new RuntimeException("User not found with ID: " + userId);
         }
@@ -151,5 +160,21 @@ public class UserService implements UserServiceInterface {
             userDTOS.add(userDTO);
         }
         return userDTOS;
+    }
+
+    //根据传入的userdto,修改用户信息
+    @Override
+    public void updateUser(UserDTO userDTO) {
+        Optional<User> userOptional = userRepository.findById(userDTO.getId());
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            user.setAccount(userDTO.getAccount());
+            user.setEmail(userDTO.getEmail());
+            user.setRole(userDTO.getRole());
+            user.setDisabled(userDTO.isDisabled());
+            userRepository.save(user);
+        } else {
+            throw new RuntimeException("User not found with ID: " + userDTO.getId());
+        }
     }
 }

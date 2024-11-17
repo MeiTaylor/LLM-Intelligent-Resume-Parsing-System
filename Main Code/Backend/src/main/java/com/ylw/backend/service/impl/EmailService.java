@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.LinkedHashMap;
 
 @Service
 public class EmailService implements EmailServiceInterface {
@@ -134,12 +135,14 @@ public class EmailService implements EmailServiceInterface {
                         row -> ((Long) row[1]).intValue()
                 ));
 
-        // 使用 Java Stream 填充结果，确保 7 天内所有日期都有数据
+        // 使用 Java Stream 填充结果，确保 7 天内所有日期都有数据，使用 LinkedHashMap 保持顺序
         return Stream.iterate(startDate.toLocalDate(), date -> date.plusDays(1))
                 .limit(7)
                 .collect(Collectors.toMap(
                         date -> date,
-                        date -> countsMap.getOrDefault(date, 0)
+                        date -> countsMap.getOrDefault(date, 0),
+                        (oldValue, newValue) -> oldValue,
+                        LinkedHashMap::new // 保持插入顺序
                 ));
     }
 }
